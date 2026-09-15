@@ -1,7 +1,11 @@
 package com.dispatchai.dispatch.domain.model.exceptions;
 
-public class AssignmentNotFoundException extends RuntimeException {
-  public AssignmentNotFoundException(String message) {
-    super(message);
+import java.util.UUID;
+
+public class AssignmentNotFoundException
+    extends RuntimeException {
+
+  public AssignmentNotFoundException(UUID assignmentId) {
+    super("Assignment not found: " + assignmentId);
   }
 }
