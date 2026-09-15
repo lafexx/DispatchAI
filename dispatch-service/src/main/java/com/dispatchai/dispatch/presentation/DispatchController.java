@@ -2,6 +2,7 @@ package com.dispatchai.dispatch.presentation;
 
 import java.util.UUID;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dispatchai.dispatch.application.DispatchApplicationService;
 import com.dispatchai.dispatch.presentation.dto.AssignmentResponse;
+import com.dispatchai.dispatch.presentation.dto.AutoAssignRequest;
 import com.dispatchai.dispatch.presentation.dto.CreateAssignmentRequest;
 
 import jakarta.validation.Valid;
@@ -41,5 +43,12 @@ public class DispatchController {
   @GetMapping("/deliveries/{deliveryId}/assignment")
   public AssignmentResponse getByDeliveryId(@PathVariable UUID deliveryId) {
     return dispatchService.getByDeliveryId(deliveryId);
+  }
+
+  @PostMapping("/assignments/auto")
+  public ResponseEntity<AssignmentResponse> autoAssign(@Valid @RequestBody AutoAssignRequest request) {
+    var result = dispatchService.autoAssign(request);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 }
