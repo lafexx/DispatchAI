@@ -10,26 +10,35 @@ import com.dispatchai.delivery.domain.model.exceptions.InvalidDeliveryStateExcep
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
   @ExceptionHandler(DeliveryNotFoundException.class)
-  public ResponseEntity<ApiError> handleNotFound(DeliveryNotFoundException ex) {
+  public ResponseEntity<ApiError> handleDeliveryNotFound(
+      DeliveryNotFoundException ex) {
+
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
-        .body(new ApiError(ex.getMessage()));
+        .body(ApiError.of(
+            HttpStatus.NOT_FOUND,
+            ex.getMessage()));
   }
 
   @ExceptionHandler(InvalidDeliveryStateException.class)
-  public ResponseEntity<ApiError> handleConflict(InvalidDeliveryStateException ex) {
+  public ResponseEntity<ApiError> handleInvalidDeliveryState(
+      InvalidDeliveryStateException ex) {
 
     return ResponseEntity
         .status(HttpStatus.CONFLICT)
-        .body(new ApiError(ex.getMessage()));
+        .body(ApiError.of(
+            HttpStatus.CONFLICT,
+            ex.getMessage()));
   }
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ApiError> handleBadRequest(IllegalArgumentException ex) {
-
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ApiError> handleUnexpected(Exception ex) {
     return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(new ApiError(ex.getMessage()));
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ApiError.of(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "An unexpected error occurred"));
   }
 }

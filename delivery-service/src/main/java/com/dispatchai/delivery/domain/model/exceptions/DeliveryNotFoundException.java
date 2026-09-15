@@ -1,7 +1,10 @@
 package com.dispatchai.delivery.domain.model.exceptions;
 
+import java.util.UUID;
+
 public class DeliveryNotFoundException extends RuntimeException {
-  public DeliveryNotFoundException(String message) {
-    super(message);
+
+  public DeliveryNotFoundException(UUID deliveryId) {
+    super("Delivery not found: " + deliveryId);
   }
 }

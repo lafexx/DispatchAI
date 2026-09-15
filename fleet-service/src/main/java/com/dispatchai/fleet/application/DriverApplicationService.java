@@ -32,7 +32,7 @@ public class DriverApplicationService {
 
   public DriverResponse get(UUID id) {
     var driver = repository.findById(id)
-        .orElseThrow(() -> new DriverNotFoundException("Driver not found: " + id));
+        .orElseThrow(() -> new DriverNotFoundException(id));
 
     return toResponse(driver);
   }
@@ -46,7 +46,7 @@ public class DriverApplicationService {
 
   public DriverResponse setAvailability(UUID id, SetDriverAvailabilityRequest request) {
     var driver = repository.findById(id)
-        .orElseThrow(() -> new DriverNotFoundException("Driver not found: " + id));
+        .orElseThrow(() -> new DriverNotFoundException(id));
 
     if (request.available()) {
       driver.markAvailable();

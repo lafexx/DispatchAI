@@ -31,7 +31,7 @@ public class VehicleApplicationService {
 
   public VehicleResponse get(UUID id) {
     var vehicle = repository.findById(id)
-        .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found: " + id));
+        .orElseThrow(() -> new VehicleNotFoundException(id));
 
     return toResponse(vehicle);
   }
@@ -44,7 +44,7 @@ public class VehicleApplicationService {
 
   public VehicleResponse setAvailability(UUID id, SetVehicleAvailabilityRequest request) {
     var vehicle = repository.findById(id)
-        .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found: " + id));
+        .orElseThrow(() -> new VehicleNotFoundException(id));
 
     if (request.available()) {
       vehicle.markAvailable();

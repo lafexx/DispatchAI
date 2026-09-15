@@ -31,14 +31,14 @@ public class DeliveryApplicationService {
 
   public DeliveryResponse get(UUID id) {
     var delivery = repository.findById(id)
-        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
+        .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     return toResponse(delivery);
   }
 
   public DeliveryResponse assign(UUID id, AssignDeliveryRequest request) {
     var delivery = repository.findById(id)
-        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
+        .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.assign(request.driverId());
 
@@ -49,7 +49,7 @@ public class DeliveryApplicationService {
 
   public DeliveryResponse start(UUID id) {
     var delivery = repository.findById(id)
-        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
+        .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.start();
 
@@ -60,7 +60,7 @@ public class DeliveryApplicationService {
 
   public DeliveryResponse complete(UUID id) {
     var delivery = repository.findById(id)
-        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
+        .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.complete();
 
@@ -71,7 +71,7 @@ public class DeliveryApplicationService {
 
   public DeliveryResponse cancel(UUID id, CancelDeliveryRequest request) {
     var delivery = repository.findById(id)
-        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
+        .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.cancel(request.reason(), request.notes());
 
