@@ -1,0 +1,39 @@
+package com.dispatchai.delivery.application;
+
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import com.dispatchai.delivery.domain.model.Delivery;
+import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
+import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
+import com.dispatchai.delivery.presentation.dto.DeliveryResponse;
+
+@Service
+public class DeliveryApplicationService {
+  private final DeliveryJpaRepository repository;
+
+  public DeliveryApplicationService(DeliveryJpaRepository repository) {
+    this.repository = repository;
+  }
+
+  public DeliveryResponse create(CreateDeliveryRequest request) {
+    var delivery = new Delivery(UUID.randomUUID(), request.customerId(), request.pickupAddress(),
+        request.destinationAddress());
+
+    repository.save(delivery);
+
+    return toResponse(delivery);
+  }
+
+  public DeliveryResponse get(UUID id) {
+    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+
+    return toResponse(delivery);
+  }
+
+  private DeliveryResponse toResponse(Delivery delivery) {
+    return new DeliveryResponse(delivery.getId(), delivery.getCustomerId(), delivery.getPickupAddress(),
+        delivery.getDestinationAddress(), delivery.getStatus().name());
+  }
+}
