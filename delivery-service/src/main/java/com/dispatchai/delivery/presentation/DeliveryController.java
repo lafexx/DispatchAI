@@ -42,7 +42,7 @@ public class DeliveryController {
 
   @PostMapping("/{id}/assign")
   public DeliveryResponse assign(@PathVariable UUID id, @Valid @RequestBody AssignDeliveryRequest request) {
-    return deliveryService.assign(id, request);
+    return deliveryService.assign(id, request.driverId());
   }
 
   @PostMapping("/{id}/start")

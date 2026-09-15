@@ -59,6 +59,17 @@ public class DriverApplicationService {
     return toResponse(driver);
   }
 
+  public DriverResponse markUnavailable(UUID driverId) {
+    var driver = repository.findById(driverId)
+        .orElseThrow(() -> new DriverNotFoundException(driverId));
+
+    driver.markUnavailable();
+
+    repository.save(driver);
+
+    return toResponse(driver);
+  }
+
   private DriverResponse toResponse(Driver driver) {
     return new DriverResponse(driver.getId(), driver.getName(), driver.getAvailability());
   }

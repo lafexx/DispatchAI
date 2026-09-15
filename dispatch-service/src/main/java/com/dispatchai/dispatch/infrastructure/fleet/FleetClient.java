@@ -32,17 +32,4 @@ public class FleetClient {
         .retrieve()
         .body(FleetDriverResponse.class);
   }
-
-  // NOTE: replace with kafka when it is setup
-  public void setDriverAvailability(
-      UUID driverId,
-      boolean available) {
-
-    restClient
-        .post()
-        .uri("/api/drivers/{id}/availability", driverId)
-        .body(new SetDriverAvailabilityRequest(available))
-        .retrieve()
-        .toBodilessEntity();
-  }
 }

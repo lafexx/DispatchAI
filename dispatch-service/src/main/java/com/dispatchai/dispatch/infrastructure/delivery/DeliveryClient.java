@@ -34,17 +34,4 @@ public class DeliveryClient {
       throw new DeliveryNotFoundException(deliveryId);
     }
   }
-
-  // NOTE: replace with kafka when it is setup
-  public DeliveryResponse assignDelivery(
-      UUID deliveryId,
-      UUID driverId) {
-
-    return restClient
-        .post()
-        .uri("/api/deliveries/{id}/assign", deliveryId)
-        .body(new AssignDeliveryRequest(driverId))
-        .retrieve()
-        .body(DeliveryResponse.class);
-  }
 }

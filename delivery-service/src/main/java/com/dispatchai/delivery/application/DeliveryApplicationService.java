@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.dispatchai.delivery.domain.model.Delivery;
 import com.dispatchai.delivery.domain.model.exceptions.DeliveryNotFoundException;
 import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
-import com.dispatchai.delivery.presentation.dto.AssignDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.DeliveryResponse;
@@ -36,11 +35,11 @@ public class DeliveryApplicationService {
     return toResponse(delivery);
   }
 
-  public DeliveryResponse assign(UUID id, AssignDeliveryRequest request) {
+  public DeliveryResponse assign(UUID id, UUID driverId) {
     var delivery = repository.findById(id)
         .orElseThrow(() -> new DeliveryNotFoundException(id));
 
-    delivery.assign(request.driverId());
+    delivery.assign(driverId);
 
     repository.save(delivery);
 

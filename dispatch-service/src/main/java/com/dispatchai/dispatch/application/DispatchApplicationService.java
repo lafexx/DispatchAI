@@ -1,5 +1,6 @@
 package com.dispatchai.dispatch.application;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import com.dispatchai.dispatch.domain.model.exceptions.DeliveryNotFoundException
 import com.dispatchai.dispatch.domain.model.exceptions.NoAvailableDriverException;
 import com.dispatchai.dispatch.infrastructure.delivery.DeliveryClient;
 import com.dispatchai.dispatch.infrastructure.fleet.FleetClient;
+import com.dispatchai.dispatch.infrastructure.messaging.AssignmentEventPublisher;
+import com.dispatchai.dispatch.infrastructure.messaging.DriverAssignedEvent;
 import com.dispatchai.dispatch.infrastructure.persistence.DeliveryAssignmentJpaRepository;
 import com.dispatchai.dispatch.presentation.dto.AssignmentResponse;
 import com.dispatchai.dispatch.presentation.dto.AutoAssignRequest;
@@ -24,14 +27,17 @@ public class DispatchApplicationService {
   private final DeliveryAssignmentJpaRepository repository;
   private final FleetClient fleetClient;
   private final DeliveryClient deliveryClient;
+  private final AssignmentEventPublisher eventPublisher;
 
   public DispatchApplicationService(
       DeliveryAssignmentJpaRepository repository,
       FleetClient fleetClient,
-      DeliveryClient deliveryClient) {
+      DeliveryClient deliveryClient,
+      AssignmentEventPublisher eventPublisher) {
     this.repository = repository;
     this.fleetClient = fleetClient;
     this.deliveryClient = deliveryClient;
+    this.eventPublisher = eventPublisher;
   }
 
   public AssignmentResponse create(
@@ -59,6 +65,9 @@ public class DispatchApplicationService {
         request.vehicleId());
 
     repository.save(assignment);
+
+    eventPublisher.publish(new DriverAssignedEvent(UUID.randomUUID(), assignment.getId(), assignment.getDeliveryId(),
+        assignment.getDriverId(), assignment.getVehicleId(), Instant.now()));
 
     return toResponse(assignment);
   }
@@ -88,10 +97,7 @@ public class DispatchApplicationService {
 
   public AssignmentResponse autoAssign(AutoAssignRequest request) {
     validateDeliveryCanBeAssigned(request.deliveryId());
-
-    if (repository.existsByDeliveryIdAndStatus(request.deliveryId(), AssignmentStatus.ACTIVE)) {
-      throw new IllegalStateException("Delivery already has an active assignment");
-    }
+    ensureNoActiveAssignment(request.deliveryId());
 
     var availableDrivers = fleetClient.getAvailableDrivers();
 
@@ -99,19 +105,31 @@ public class DispatchApplicationService {
       throw new NoAvailableDriverException("No drivers are currently available");
     }
 
-    var delivery = deliveryClient.getDelivery(request.deliveryId());
-    var selectedDriver = availableDrivers.getFirst();
+    var driver = availableDrivers.getFirst();
 
-    var assignment = new DeliveryAssignment(UUID.randomUUID(), request.deliveryId(), selectedDriver.id(),
+    var assignment = new DeliveryAssignment(UUID.randomUUID(), request.deliveryId(), driver.id(),
         request.vehicleId());
-
-    // NOTE: remove once kafka is setup as this method will be deprecated
-    deliveryClient.assignDelivery(request.deliveryId(), selectedDriver.id());
-    fleetClient.setDriverAvailability(selectedDriver.id(), false);
 
     repository.save(assignment);
 
+    eventPublisher.publish(
+        new DriverAssignedEvent(
+            UUID.randomUUID(),
+            assignment.getId(),
+            assignment.getDeliveryId(),
+            assignment.getDriverId(),
+            assignment.getVehicleId(),
+            Instant.now()));
+
     return toResponse(assignment);
+  }
+
+  private void ensureNoActiveAssignment(UUID deliveryId) {
+    if (repository.existsByDeliveryIdAndStatus(deliveryId, AssignmentStatus.ACTIVE)) {
+      throw new IllegalStateException("Delivery already has an active assignment");
+    }
+
+    return;
   }
 
   private AssignmentResponse toResponse(DeliveryAssignment assignment) {
