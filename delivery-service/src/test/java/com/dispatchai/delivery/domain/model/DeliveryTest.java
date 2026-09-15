@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import com.dispatchai.delivery.domain.model.exceptions.InvalidDeliveryStateException;
+
 class DeliveryTest {
   private Delivery createDelivery() {
     return new Delivery(UUID.randomUUID(), UUID.randomUUID(), "1 Bing Street, Sydney", "2 Bang Street, Wollongong");
@@ -100,7 +102,7 @@ class DeliveryTest {
   void pendingDeliveryCanBeCancelled() {
     var delivery = createDelivery();
 
-    delivery.cancel();
+    delivery.cancel(CancellationReason.CUSTOMER_REQUEST, "Cancellation requested by customer");
 
     assertEquals(
         DeliveryStatus.CANCELLED,
@@ -112,7 +114,7 @@ class DeliveryTest {
     var delivery = createDelivery();
 
     delivery.assign(UUID.randomUUID());
-    delivery.cancel();
+    delivery.cancel(CancellationReason.CUSTOMER_REQUEST, "Cancellation requested by customer");
 
     assertEquals(
         DeliveryStatus.CANCELLED,
@@ -129,7 +131,7 @@ class DeliveryTest {
 
     assertThrows(
         InvalidDeliveryStateException.class,
-        delivery::cancel);
+        () -> delivery.cancel(CancellationReason.CUSTOMER_REQUEST, "Cancellation requested by customer"));
 
     assertEquals(
         DeliveryStatus.COMPLETED,
@@ -140,7 +142,7 @@ class DeliveryTest {
   void cancelledDeliveryCannotBeStarted() {
     var delivery = createDelivery();
 
-    delivery.cancel();
+    delivery.cancel(CancellationReason.CUSTOMER_REQUEST, "Cancellation requested by customer");
 
     assertThrows(
         InvalidDeliveryStateException.class,
