@@ -20,7 +20,6 @@ import com.dispatchai.dispatch.infrastructure.delivery.DeliveryClient;
 import com.dispatchai.dispatch.infrastructure.delivery.DeliveryResponse;
 import com.dispatchai.dispatch.infrastructure.fleet.FleetClient;
 import com.dispatchai.dispatch.infrastructure.persistence.DeliveryAssignmentJpaRepository;
-import com.dispatchai.dispatch.presentation.dto.AutoAssignRequest;
 
 @ExtendWith(MockitoExtension.class)
 class DispatchApplicationServiceTest {
@@ -53,9 +52,8 @@ class DispatchApplicationServiceTest {
     assertThrows(
         DeliveryNotAssignableException.class,
         () -> service.autoAssign(
-            new AutoAssignRequest(
-                deliveryId,
-                null)));
+            deliveryId,
+            null));
 
     verify(fleetClient, never())
         .getAvailableDrivers();

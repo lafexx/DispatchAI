@@ -95,9 +95,9 @@ public class DispatchApplicationService {
     return toResponse(assignment);
   }
 
-  public AssignmentResponse autoAssign(AutoAssignRequest request) {
-    validateDeliveryCanBeAssigned(request.deliveryId());
-    ensureNoActiveAssignment(request.deliveryId());
+  public AssignmentResponse autoAssign(UUID deliveryId, UUID vehicleId) {
+    validateDeliveryCanBeAssigned(deliveryId);
+    ensureNoActiveAssignment(deliveryId);
 
     var availableDrivers = fleetClient.getAvailableDrivers();
 
@@ -107,8 +107,8 @@ public class DispatchApplicationService {
 
     var driver = availableDrivers.getFirst();
 
-    var assignment = new DeliveryAssignment(UUID.randomUUID(), request.deliveryId(), driver.id(),
-        request.vehicleId());
+    var assignment = new DeliveryAssignment(UUID.randomUUID(), deliveryId, driver.id(),
+        vehicleId);
 
     repository.save(assignment);
 
