@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.dispatchai.delivery.domain.model.Delivery;
+import com.dispatchai.delivery.domain.model.exceptions.DeliveryNotFoundException;
 import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
 import com.dispatchai.delivery.presentation.dto.AssignDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
@@ -29,13 +30,15 @@ public class DeliveryApplicationService {
   }
 
   public DeliveryResponse get(UUID id) {
-    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+    var delivery = repository.findById(id)
+        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
 
     return toResponse(delivery);
   }
 
   public DeliveryResponse assign(UUID id, AssignDeliveryRequest request) {
-    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+    var delivery = repository.findById(id)
+        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
 
     delivery.assign(request.driverId());
 
@@ -45,7 +48,8 @@ public class DeliveryApplicationService {
   }
 
   public DeliveryResponse start(UUID id) {
-    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+    var delivery = repository.findById(id)
+        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
 
     delivery.start();
 
@@ -55,7 +59,8 @@ public class DeliveryApplicationService {
   }
 
   public DeliveryResponse complete(UUID id) {
-    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+    var delivery = repository.findById(id)
+        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
 
     delivery.complete();
 
@@ -65,7 +70,8 @@ public class DeliveryApplicationService {
   }
 
   public DeliveryResponse cancel(UUID id, CancelDeliveryRequest request) {
-    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+    var delivery = repository.findById(id)
+        .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found: " + id));
 
     delivery.cancel(request.reason(), request.notes());
 
