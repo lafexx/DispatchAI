@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.dispatchai.delivery.domain.model.Delivery;
 import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
+import com.dispatchai.delivery.presentation.dto.AssignDeliveryRequest;
+import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.DeliveryResponse;
 
@@ -28,6 +30,46 @@ public class DeliveryApplicationService {
 
   public DeliveryResponse get(UUID id) {
     var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+
+    return toResponse(delivery);
+  }
+
+  public DeliveryResponse assign(UUID id, AssignDeliveryRequest request) {
+    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+
+    delivery.assign(request.driverId());
+
+    repository.save(delivery);
+
+    return toResponse(delivery);
+  }
+
+  public DeliveryResponse start(UUID id) {
+    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+
+    delivery.start();
+
+    repository.save(delivery);
+
+    return toResponse(delivery);
+  }
+
+  public DeliveryResponse complete(UUID id) {
+    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+
+    delivery.complete();
+
+    repository.save(delivery);
+
+    return toResponse(delivery);
+  }
+
+  public DeliveryResponse cancel(UUID id, CancelDeliveryRequest request) {
+    var delivery = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Delivery not found: " + id));
+
+    delivery.cancel(request.reason(), request.notes());
+
+    repository.save(delivery);
 
     return toResponse(delivery);
   }

@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -24,11 +25,24 @@ public class Delivery {
   @Column(nullable = false)
   private String destinationAddress;
 
+  @Column(nullable = true)
   private UUID assignedDriverId;
+
+  @Column(nullable = true)
+  private CancellationReason cancellationReason;
+
+  @Column(nullable = true)
+  private String cancellationNotes;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private DeliveryStatus status;
+
+  @Column(nullable = false)
+  private Instant createdAt;
+
+  @Column(nullable = false)
+  private Instant updatedAt;
 
   protected Delivery() {
   }
@@ -39,6 +53,11 @@ public class Delivery {
     this.pickupAddress = pickupAddress;
     this.destinationAddress = destinationAddress;
     this.status = DeliveryStatus.PENDING;
+
+    var now = Instant.now();
+
+    this.createdAt = now;
+    this.updatedAt = now;
   }
 
   public void assign(UUID driverId) {
@@ -52,6 +71,7 @@ public class Delivery {
 
     assignedDriverId = driverId;
     status = DeliveryStatus.ASSIGNED;
+    updatedAt = Instant.now();
   }
 
   public void start() {
@@ -60,6 +80,7 @@ public class Delivery {
     }
 
     status = DeliveryStatus.IN_TRANSIT;
+    updatedAt = Instant.now();
   }
 
   public void complete() {
@@ -68,9 +89,10 @@ public class Delivery {
     }
 
     status = DeliveryStatus.COMPLETED;
+    updatedAt = Instant.now();
   }
 
-  public void cancel() {
+  public void cancel(CancellationReason reason, String notes) {
     if (status == DeliveryStatus.COMPLETED) {
       throw new InvalidDeliveryStateException("Completed deliveries cannot be cancelled");
     }
@@ -79,7 +101,10 @@ public class Delivery {
       throw new InvalidDeliveryStateException("Delivery is already cancelled");
     }
 
+    this.cancellationReason = reason;
+    this.cancellationNotes = notes;
     status = DeliveryStatus.CANCELLED;
+    updatedAt = Instant.now();
   }
 
   public UUID getId() {

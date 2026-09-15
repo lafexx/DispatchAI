@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dispatchai.delivery.application.DeliveryApplicationService;
+import com.dispatchai.delivery.presentation.dto.AssignDeliveryRequest;
+import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.DeliveryResponse;
 
@@ -36,5 +38,25 @@ public class DeliveryController {
   @GetMapping("/{id}")
   public DeliveryResponse get(@PathVariable UUID id) {
     return deliveryService.get(id);
+  }
+
+  @PostMapping("/{id}/assign")
+  public DeliveryResponse assign(@PathVariable UUID id, @Valid @RequestBody AssignDeliveryRequest request) {
+    return deliveryService.assign(id, request);
+  }
+
+  @PostMapping("/{id}/start")
+  public DeliveryResponse start(@PathVariable UUID id) {
+    return deliveryService.start(id);
+  }
+
+  @PostMapping("/{id}/complete")
+  public DeliveryResponse complete(@PathVariable UUID id) {
+    return deliveryService.complete(id);
+  }
+
+  @PostMapping("/{id}/cancel")
+  public DeliveryResponse cancel(@PathVariable UUID id, @Valid @RequestBody CancelDeliveryRequest request) {
+    return deliveryService.cancel(id, request);
   }
 }
