@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.dispatchai.delivery.domain.model.exceptions.InvalidDeliveryStateException;
+
 @Entity
 @Table(name = "deliveries")
 public class Delivery {
