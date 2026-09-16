@@ -11,6 +11,7 @@ import com.dispatchai.customer.domain.model.Notification;
 import com.dispatchai.customer.domain.model.NotificationType;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCancelledEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCompletedEvent;
+import com.dispatchai.customer.infrastructure.messaging.event.DeliveryDelayedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryStartedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DriverAssignedEvent;
 import com.dispatchai.customer.infrastructure.persistence.CustomerJpaRepository;
@@ -79,6 +80,20 @@ public class NotificationApplicationService {
         event.deliveryId(),
         NotificationType.DELIVERY_CANCELLED,
         "Your delivery has been cancelled: " + event.reason());
+  }
+
+  public void notifyDeliveryDelayed(
+      DeliveryDelayedEvent event) {
+
+    createNotification(
+        event.eventId(),
+        event.customerId(),
+        event.deliveryId(),
+        NotificationType.DELIVERY_DELAYED,
+        "Your delivery has been delayed by "
+            + event.delayMinutes()
+            + " minutes. Reason: "
+            + event.reason());
   }
 
   private void createNotification(

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import com.dispatchai.customer.application.NotificationApplicationService;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCancelledEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCompletedEvent;
+import com.dispatchai.customer.infrastructure.messaging.event.DeliveryDelayedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryStartedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DriverAssignedEvent;
 
@@ -40,5 +41,12 @@ public class CustomerEventConsumer {
       NotificationApplicationService notificationService) {
 
     return notificationService::notifyDeliveryCancelled;
+  }
+
+  @Bean
+  public Consumer<DeliveryDelayedEvent> deliveryDelayed(
+      NotificationApplicationService notificationService) {
+
+    return notificationService::notifyDeliveryDelayed;
   }
 }
