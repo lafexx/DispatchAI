@@ -3,6 +3,11 @@ package com.dispatchai.delivery.infrastructure.messaging;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Component;
 
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCancelledEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCompletedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCreatedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryStartedEvent;
+
 @Component
 public class DeliveryEventPublisher {
 
@@ -14,5 +19,17 @@ public class DeliveryEventPublisher {
 
   public void publish(DeliveryCreatedEvent event) {
     streamBridge.send("deliveryCreated-out-0", event);
+  }
+
+  public void publish(DeliveryStartedEvent event) {
+    streamBridge.send("deliveryStarted-out-0", event);
+  }
+
+  public void publish(DeliveryCompletedEvent event) {
+    streamBridge.send("deliveryCompleted-out-0", event);
+  }
+
+  public void publish(DeliveryCancelledEvent event) {
+    streamBridge.send("deliveryCancelled-out-0", event);
   }
 }

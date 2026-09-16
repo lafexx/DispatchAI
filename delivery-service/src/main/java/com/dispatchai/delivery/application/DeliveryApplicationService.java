@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.dispatchai.delivery.domain.model.Delivery;
 import com.dispatchai.delivery.domain.model.exceptions.DeliveryNotFoundException;
-import com.dispatchai.delivery.infrastructure.messaging.DeliveryCreatedEvent;
 import com.dispatchai.delivery.infrastructure.messaging.DeliveryEventPublisher;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCancelledEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCompletedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCreatedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryStartedEvent;
 import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
 import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
@@ -67,8 +70,14 @@ public class DeliveryApplicationService {
         .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.start();
-
     repository.save(delivery);
+
+    eventPublisher.publish(new DeliveryStartedEvent(
+        UUID.randomUUID(),
+        delivery.getId(),
+        delivery.getCustomerId(),
+        delivery.getAssignedDriverId(),
+        Instant.now()));
 
     return toResponse(delivery);
   }
@@ -78,8 +87,14 @@ public class DeliveryApplicationService {
         .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.complete();
-
     repository.save(delivery);
+
+    eventPublisher.publish(new DeliveryCompletedEvent(
+        UUID.randomUUID(),
+        delivery.getId(),
+        delivery.getCustomerId(),
+        delivery.getAssignedDriverId(),
+        Instant.now()));
 
     return toResponse(delivery);
   }
@@ -89,8 +104,16 @@ public class DeliveryApplicationService {
         .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     delivery.cancel(request.reason(), request.notes());
-
     repository.save(delivery);
+
+    eventPublisher.publish(new DeliveryCancelledEvent(
+        UUID.randomUUID(),
+        delivery.getId(),
+        delivery.getCustomerId(),
+        delivery.getAssignedDriverId(),
+        request.reason(),
+        request.notes(),
+        Instant.now()));
 
     return toResponse(delivery);
   }

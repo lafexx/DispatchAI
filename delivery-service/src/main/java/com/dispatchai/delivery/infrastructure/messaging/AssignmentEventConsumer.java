@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.dispatchai.delivery.application.DeliveryApplicationService;
+import com.dispatchai.delivery.infrastructure.messaging.events.DriverAssignedEvent;
 
 @Configuration
 public class AssignmentEventConsumer {
