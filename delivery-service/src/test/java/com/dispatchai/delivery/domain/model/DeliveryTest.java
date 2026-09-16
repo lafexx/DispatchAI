@@ -1,6 +1,7 @@
 package com.dispatchai.delivery.domain.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -183,5 +184,134 @@ class DeliveryTest {
     assertEquals(
         firstDriver,
         delivery.getAssignedDriverId());
+  }
+
+  @Test
+  void activeDeliveryCanBeMarkedDelayed() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+    delivery.start();
+
+    delivery.markDelayed(30, "Heavy traffic");
+
+    assertEquals(true, delivery.isDelayed());
+    assertEquals(30, delivery.getDelayMinutes());
+    assertEquals("Heavy traffic", delivery.getDelayReason());
+  }
+
+  @Test
+  void delayMinutesMustBePositive() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> delivery.markDelayed(0, "Heavy traffic"));
+
+    assertEquals(false, delivery.isDelayed());
+  }
+
+  @Test
+  void delayReasonCannotBeBlank() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> delivery.markDelayed(30, "   "));
+
+    assertEquals(false, delivery.isDelayed());
+  }
+
+  @Test
+  void completedDeliveryCannotBeDelayed() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+    delivery.start();
+    delivery.complete();
+
+    assertThrows(
+        InvalidDeliveryStateException.class,
+        () -> delivery.markDelayed(30, "Heavy traffic"));
+
+    assertEquals(
+        DeliveryStatus.COMPLETED,
+        delivery.getStatus());
+
+    assertEquals(false, delivery.isDelayed());
+  }
+
+  @Test
+  void cancelledDeliveryCannotBeDelayed() {
+    var delivery = createDelivery();
+
+    delivery.cancel(
+        CancellationReason.CUSTOMER_REQUEST,
+        "Cancellation requested by customer");
+
+    assertThrows(
+        InvalidDeliveryStateException.class,
+        () -> delivery.markDelayed(30, "Heavy traffic"));
+
+    assertEquals(
+        DeliveryStatus.CANCELLED,
+        delivery.getStatus());
+
+    assertEquals(false, delivery.isDelayed());
+  }
+
+  @Test
+  void markingDelayedDoesNotChangeLifecycleStatus() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+
+    delivery.markDelayed(30, "Heavy traffic");
+
+    assertEquals(
+        DeliveryStatus.ASSIGNED,
+        delivery.getStatus());
+
+    assertEquals(true, delivery.isDelayed());
+  }
+
+  @Test
+  void markingDeliveryDelayedSetsDelayedAtTimestamp() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+
+    var before = java.time.Instant.now();
+
+    delivery.markDelayed(30, "Heavy traffic");
+
+    var after = java.time.Instant.now();
+
+    assertEquals(true, delivery.isDelayed());
+
+    var delayedAt = delivery.getDelayedAt();
+
+    assertEquals(false, delayedAt.isBefore(before));
+    assertEquals(false, delayedAt.isAfter(after));
+  }
+
+  @Test
+  void invalidDelayDoesNotMutateDelivery() {
+    var delivery = createDelivery();
+
+    delivery.assign(UUID.randomUUID());
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> delivery.markDelayed(-10, "Heavy traffic"));
+
+    assertFalse(delivery.isDelayed());
+    assertNull(delivery.getDelayMinutes());
+    assertNull(delivery.getDelayReason());
+    assertNull(delivery.getDelayedAt());
   }
 }
