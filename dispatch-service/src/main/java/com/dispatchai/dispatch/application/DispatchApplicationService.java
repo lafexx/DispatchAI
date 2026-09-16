@@ -18,7 +18,6 @@ import com.dispatchai.dispatch.infrastructure.messaging.AssignmentEventPublisher
 import com.dispatchai.dispatch.infrastructure.messaging.DriverAssignedEvent;
 import com.dispatchai.dispatch.infrastructure.persistence.DeliveryAssignmentJpaRepository;
 import com.dispatchai.dispatch.presentation.dto.AssignmentResponse;
-import com.dispatchai.dispatch.presentation.dto.AutoAssignRequest;
 import com.dispatchai.dispatch.presentation.dto.CreateAssignmentRequest;
 
 @Service
