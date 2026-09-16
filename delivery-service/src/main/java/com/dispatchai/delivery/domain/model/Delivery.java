@@ -40,6 +40,14 @@ public class Delivery {
   @Column(nullable = false)
   private DeliveryStatus status;
 
+  private boolean delayed;
+
+  private Integer delayMinutes;
+
+  private String delayReason;
+
+  private Instant delayedAt;
+
   @Column(nullable = false)
   private Instant createdAt;
 
@@ -109,6 +117,36 @@ public class Delivery {
     updatedAt = Instant.now();
   }
 
+  public void markDelayed(
+      int delayMinutes,
+      String reason) {
+
+    if (status == DeliveryStatus.COMPLETED) {
+      throw new InvalidDeliveryStateException(
+          "Completed delivery cannot be delayed");
+    }
+
+    if (status == DeliveryStatus.CANCELLED) {
+      throw new InvalidDeliveryStateException(
+          "Cancelled delivery cannot be delayed");
+    }
+
+    if (delayMinutes <= 0) {
+      throw new IllegalArgumentException(
+          "Delay minutes must be greater than zero");
+    }
+
+    if (reason == null || reason.isBlank()) {
+      throw new IllegalArgumentException(
+          "Delay reason cannot be blank");
+    }
+
+    this.delayed = true;
+    this.delayMinutes = delayMinutes;
+    this.delayReason = reason;
+    this.delayedAt = Instant.now();
+  }
+
   public UUID getId() {
     return id;
   }
@@ -131,5 +169,21 @@ public class Delivery {
 
   public DeliveryStatus getStatus() {
     return status;
+  }
+
+  public boolean isDelayed() {
+    return delayed;
+  }
+
+  public Integer getDelayMinutes() {
+    return delayMinutes;
+  }
+
+  public String getDelayReason() {
+    return delayReason;
+  }
+
+  public Instant getDelayedAt() {
+    return delayedAt;
   }
 }

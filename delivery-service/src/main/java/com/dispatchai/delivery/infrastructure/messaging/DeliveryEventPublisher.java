@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCancelledEvent;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCompletedEvent;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCreatedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryDelayedEvent;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryStartedEvent;
 
 @Component
@@ -31,5 +32,9 @@ public class DeliveryEventPublisher {
 
   public void publish(DeliveryCancelledEvent event) {
     streamBridge.send("deliveryCancelled-out-0", event);
+  }
+
+  public void publish(DeliveryDelayedEvent event) {
+    streamBridge.send("deliveryDelayed-out-0", event);
   }
 }

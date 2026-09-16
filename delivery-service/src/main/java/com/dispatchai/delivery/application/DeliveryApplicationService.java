@@ -11,6 +11,7 @@ import com.dispatchai.delivery.infrastructure.messaging.DeliveryEventPublisher;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCancelledEvent;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCompletedEvent;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCreatedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryDelayedEvent;
 import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryStartedEvent;
 import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
 import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
@@ -118,8 +119,41 @@ public class DeliveryApplicationService {
     return toResponse(delivery);
   }
 
+  public DeliveryResponse delay(
+      UUID id,
+      int delayMinutes,
+      String reason) {
+
+    var delivery = repository.findById(id)
+        .orElseThrow(() -> new DeliveryNotFoundException(id));
+
+    delivery.markDelayed(delayMinutes, reason);
+
+    repository.save(delivery);
+
+    eventPublisher.publish(
+        new DeliveryDelayedEvent(
+            UUID.randomUUID(),
+            delivery.getId(),
+            delivery.getCustomerId(),
+            delivery.getAssignedDriverId(),
+            delayMinutes,
+            reason,
+            Instant.now()));
+
+    return toResponse(delivery);
+  }
+
   private DeliveryResponse toResponse(Delivery delivery) {
-    return new DeliveryResponse(delivery.getId(), delivery.getCustomerId(), delivery.getPickupAddress(),
-        delivery.getDestinationAddress(), delivery.getStatus().name());
+    return new DeliveryResponse(
+        delivery.getId(),
+        delivery.getCustomerId(),
+        delivery.getPickupAddress(),
+        delivery.getDestinationAddress(),
+        delivery.getStatus(),
+        delivery.getAssignedDriverId(),
+        delivery.isDelayed(),
+        delivery.getDelayMinutes(),
+        delivery.getDelayReason());
   }
 }

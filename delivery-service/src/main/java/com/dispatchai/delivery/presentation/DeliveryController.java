@@ -15,6 +15,7 @@ import com.dispatchai.delivery.application.DeliveryApplicationService;
 import com.dispatchai.delivery.presentation.dto.AssignDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
+import com.dispatchai.delivery.presentation.dto.DelayDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.DeliveryResponse;
 
 import jakarta.validation.Valid;
@@ -58,5 +59,16 @@ public class DeliveryController {
   @PostMapping("/{id}/cancel")
   public DeliveryResponse cancel(@PathVariable UUID id, @Valid @RequestBody CancelDeliveryRequest request) {
     return deliveryService.cancel(id, request);
+  }
+
+  @PostMapping("/{id}/delay")
+  public DeliveryResponse delay(
+      @PathVariable UUID id,
+      @Valid @RequestBody DelayDeliveryRequest request) {
+
+    return deliveryService.delay(
+        id,
+        request.delayMinutes(),
+        request.reason());
   }
 }
