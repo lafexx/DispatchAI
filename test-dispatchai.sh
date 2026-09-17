@@ -145,10 +145,12 @@ create_driver() {
 DRIVER_1_ID="$(create_driver "Driver 1 - $RUN_ID")"
 DRIVER_2_ID="$(create_driver "Driver 2 - $RUN_ID")"
 DRIVER_3_ID="$(create_driver "Driver 3 - $RUN_ID")"
+DRIVER_4_ID="$(create_driver "Driver 4 - $RUN_ID")"
+DRIVER_5_ID="$(create_driver "Driver 5 - $RUN_ID")"
 
 section "Mark drivers available"
 
-for driver_id in "$DRIVER_1_ID" "$DRIVER_2_ID" "$DRIVER_3_ID"; do
+for driver_id in "$DRIVER_1_ID" "$DRIVER_2_ID" "$DRIVER_3_ID" "$DRIVER_4_ID" "$DRIVER_5_ID"; do
   post_json \
     "$FLEET_URL/api/drivers/$driver_id/availability" \
     '{"available":true}' | jq
@@ -286,28 +288,28 @@ echo "Analytics assertions passed."
 # Operations Agent smoke tests
 # ---------------------------------------------------------------------------
 
-section "Agent: operations summary"
+section "Operations Assistant Agent: operations summary"
 
 post_json \
   "$AGENT_URL/api/agent/operations/query" \
   '{"message":"Give me a summary of the current delivery operation."}' |
   jq
 
-section "Agent: operational issues"
+section "Operations Assistant Agent: operational issues"
 
 post_json \
   "$AGENT_URL/api/agent/operations/query" \
   '{"message":"Are there any operational issues that need attention right now?"}' |
   jq
 
-section "Agent: rates"
+section "Operations Assistant Agent: rates"
 
 post_json \
   "$AGENT_URL/api/agent/operations/query" \
   '{"message":"What are the current completion, cancellation, and delay rates?"}' |
   jq
 
-section "Agent: inspect specific delayed delivery"
+section "Operations Assistant Agent: inspect specific delayed delivery"
 
 post_json \
   "$AGENT_URL/api/agent/operations/query" \
@@ -316,7 +318,7 @@ post_json \
   }" |
   jq
 
-section "Agent: inspect assigned driver"
+section "Operations Assistant Agent: inspect assigned driver"
 
 post_json \
   "$AGENT_URL/api/agent/operations/query" \
@@ -325,12 +327,21 @@ post_json \
   }" |
   jq
 
-section "Agent: chained delivery -> driver lookup"
+section "Operations Assistant Agent: chained delivery -> driver lookup"
 
 post_json \
   "$AGENT_URL/api/agent/operations/query" \
   "{
     \"message\": \"Who is assigned to delivery $DELIVERY_2_ID and what is that driver's current availability?\"
+  }" |
+  jq
+
+section "Dispatch Advisor Agent: recommend driver"
+
+post_json \
+  "$AGENT_URL/api/agent/dispatch/advice" \
+  "{
+    \"message\": \"Which available driver would you recommend for delivery $DELIVERY_2_ID?\"
   }" |
   jq
 
