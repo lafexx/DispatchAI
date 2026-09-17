@@ -1,12 +1,17 @@
 package com.dispatchai.analytics.infrastructure.messaging;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.support.serializer.JacksonJsonSerde;
 
 import com.dispatchai.analytics.domain.model.AnalyticsDeliveryStatus;
 import com.dispatchai.analytics.domain.model.DeliveryAnalyticsState;
@@ -118,13 +123,19 @@ public class DeliveryAnalyticsStreams {
   }
 
   @Bean
-  public Function<KStream<String, DeliveryStateUpdate>, KTable<String, DeliveryAnalyticsState>> deliveryStateAggregator() {
+  public Consumer<KStream<String, DeliveryStateUpdate>> deliveryStateAggregator() {
+
+    var stateSerde = new JacksonJsonSerde<>(DeliveryAnalyticsState.class);
 
     return input -> input
         .groupByKey()
         .aggregate(
             DeliveryAnalyticsState::empty,
             (deliveryId, update, state) -> state.apply(update),
-            Materialized.as("delivery-state-store"));
+            Materialized
+                .<String, DeliveryAnalyticsState, KeyValueStore<Bytes, byte[]>>as(
+                    "delivery-state-store")
+                .withKeySerde(Serdes.String())
+                .withValueSerde(stateSerde));
   }
 }

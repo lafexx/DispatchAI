@@ -143,8 +143,10 @@ services:
       DELIVERY_SERVICE_BASE_URL: http://delivery-service:8081
       FLEET_SERVICE_BASE_URL: http://fleet-service:8082
       DISPATCH_SERVICE_BASE_URL: http://dispatch-service:8083
+      ANALYTICS_SERVICE_URL: http://analytics-service:8085
 
       KAFKA_BOOTSTRAP_SERVERS: broker:19092
+      OLLAMA_BASE_URL: http://ollama:11434
 
     depends_on:
       - delivery-service
@@ -152,8 +154,20 @@ services:
       - dispatch-service
       - broker
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: dispatchai-ollama
+    gpus: all
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
   tools:
     image: alpine:3.22
     profiles:
       - tools
     command: sleep infinity
+
+volumes:
+  ollama-data:
