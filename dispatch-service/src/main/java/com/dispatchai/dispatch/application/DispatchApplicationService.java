@@ -13,6 +13,7 @@ import com.dispatchai.dispatch.domain.model.exceptions.DeliveryNotAssignableExce
 import com.dispatchai.dispatch.domain.model.exceptions.DeliveryNotFoundException;
 import com.dispatchai.dispatch.domain.model.exceptions.NoAvailableDriverException;
 import com.dispatchai.dispatch.infrastructure.delivery.DeliveryClient;
+import com.dispatchai.dispatch.infrastructure.delivery.DeliveryResponse;
 import com.dispatchai.dispatch.infrastructure.fleet.FleetClient;
 import com.dispatchai.dispatch.infrastructure.messaging.AssignmentEventPublisher;
 import com.dispatchai.dispatch.infrastructure.messaging.DriverAssignedEvent;
@@ -41,7 +42,7 @@ public class DispatchApplicationService {
 
   public AssignmentResponse create(
       CreateAssignmentRequest request) {
-    validateDeliveryCanBeAssigned(request.deliveryId());
+    var delivery = validateDeliveryCanBeAssigned(request.deliveryId());
 
     if (repository.existsByDeliveryIdAndStatus(
         request.deliveryId(),
@@ -65,19 +66,27 @@ public class DispatchApplicationService {
 
     repository.save(assignment);
 
-    eventPublisher.publish(new DriverAssignedEvent(UUID.randomUUID(), assignment.getId(), assignment.getDeliveryId(),
-        assignment.getDriverId(), assignment.getVehicleId(), Instant.now()));
+    eventPublisher.publish(
+        new DriverAssignedEvent(
+            UUID.randomUUID(),
+            assignment.getId(),
+            assignment.getDeliveryId(),
+            delivery.customerId(),
+            assignment.getDriverId(),
+            assignment.getVehicleId(),
+            Instant.now()));
 
     return toResponse(assignment);
   }
 
-  private void validateDeliveryCanBeAssigned(UUID deliveryId) {
+  private DeliveryResponse validateDeliveryCanBeAssigned(UUID deliveryId) {
     var delivery = deliveryClient.getDelivery(deliveryId);
 
     if (delivery.status() != RemoteDeliveryStatus.PENDING)
       throw new DeliveryNotAssignableException(
           "Delivery must be pending before assignment");
 
+    return delivery;
   }
 
   public AssignmentResponse getByAssignmentId(UUID assignmentId) {
@@ -95,7 +104,7 @@ public class DispatchApplicationService {
   }
 
   public AssignmentResponse autoAssign(UUID deliveryId, UUID vehicleId) {
-    validateDeliveryCanBeAssigned(deliveryId);
+    var delivery = validateDeliveryCanBeAssigned(deliveryId);
     ensureNoActiveAssignment(deliveryId);
 
     var availableDrivers = fleetClient.getAvailableDrivers();
@@ -117,6 +126,7 @@ public class DispatchApplicationService {
             assignment.getId(),
             assignment.getDeliveryId(),
             assignment.getDriverId(),
+            delivery.customerId(),
             assignment.getVehicleId(),
             Instant.now()));
 
