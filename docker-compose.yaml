@@ -140,10 +140,9 @@ services:
       - "8086:8086"
 
     environment:
-      DELIVERY_SERVICE_BASE_URL: http://delivery-service:8081
-      FLEET_SERVICE_BASE_URL: http://fleet-service:8082
-      DISPATCH_SERVICE_BASE_URL: http://dispatch-service:8083
       ANALYTICS_SERVICE_URL: http://analytics-service:8085
+      DELIVERY_SERVICE_URL: http://delivery-service:8081
+      FLEET_SERVICE_URL: http://fleet-service:8082
 
       KAFKA_BOOTSTRAP_SERVERS: broker:19092
       OLLAMA_BASE_URL: http://ollama:11434
