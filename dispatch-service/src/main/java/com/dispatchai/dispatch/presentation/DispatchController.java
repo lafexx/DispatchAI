@@ -1,5 +1,6 @@
 package com.dispatchai.dispatch.presentation;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -49,5 +50,11 @@ public class DispatchController {
     var result = dispatchService.autoAssign(request.deliveryId(), request.vehicleId());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
+  }
+
+  @GetMapping("/drivers/{driverId}/assignments")
+  public List<AssignmentResponse> getByDriverId(
+      @PathVariable UUID driverId) {
+    return dispatchService.getByDriverId(driverId);
   }
 }

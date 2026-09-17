@@ -1,6 +1,8 @@
 package com.dispatchai.dispatch.application;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -133,6 +135,12 @@ public class DispatchApplicationService {
     return toResponse(assignment);
   }
 
+  public List<AssignmentResponse> getByDriverId(UUID driverId) {
+    var assignments = repository.findByDriverId(driverId);
+
+    return toResponse(assignments);
+  }
+
   private void ensureNoActiveAssignment(UUID deliveryId) {
     if (repository.existsByDeliveryIdAndStatus(deliveryId, AssignmentStatus.ACTIVE)) {
       throw new IllegalStateException("Delivery already has an active assignment");
@@ -142,7 +150,24 @@ public class DispatchApplicationService {
   }
 
   private AssignmentResponse toResponse(DeliveryAssignment assignment) {
-    return new AssignmentResponse(assignment.getId(), assignment.getDeliveryId(), assignment.getDriverId(),
-        assignment.getVehicleId(), assignment.getStatus());
+    return new AssignmentResponse(
+        assignment.getId(),
+        assignment.getDeliveryId(),
+        assignment.getDriverId(),
+        assignment.getVehicleId(),
+        assignment.getStatus(),
+        assignment.getAssignedAt(),
+        assignment.getCompletedAt(),
+        assignment.getCancelledAt());
+  }
+
+  private List<AssignmentResponse> toResponse(List<DeliveryAssignment> assignments) {
+    List<AssignmentResponse> responses = new ArrayList<AssignmentResponse>();
+
+    for (DeliveryAssignment assignment : assignments) {
+      responses.add(toResponse(assignment));
+    }
+
+    return responses;
   }
 }

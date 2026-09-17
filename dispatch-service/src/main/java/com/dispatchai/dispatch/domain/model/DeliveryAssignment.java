@@ -1,5 +1,6 @@
 package com.dispatchai.dispatch.domain.model;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import com.dispatchai.dispatch.domain.model.exceptions.InvalidAssignmentStateException;
@@ -29,10 +30,19 @@ public class DeliveryAssignment {
   @Column(nullable = false)
   private AssignmentStatus status;
 
+  private Instant assignedAt;
+  private Instant completedAt;
+  private Instant cancelledAt;
+
   protected DeliveryAssignment() {
   }
 
-  public DeliveryAssignment(UUID id, UUID deliveryId, UUID driverId, UUID vehicleId) {
+  public DeliveryAssignment(
+      UUID id,
+      UUID deliveryId,
+      UUID driverId,
+      UUID vehicleId) {
+
     if (id == null) {
       throw new IllegalArgumentException("Assignment ID cannot be null");
     }
@@ -50,6 +60,7 @@ public class DeliveryAssignment {
     this.driverId = driverId;
     this.vehicleId = vehicleId;
     this.status = AssignmentStatus.ACTIVE;
+    this.assignedAt = Instant.now();
   }
 
   public void complete() {
@@ -59,6 +70,7 @@ public class DeliveryAssignment {
     }
 
     status = AssignmentStatus.COMPLETED;
+    completedAt = Instant.now();
   }
 
   public void cancel() {
@@ -68,6 +80,7 @@ public class DeliveryAssignment {
     }
 
     status = AssignmentStatus.CANCELLED;
+    cancelledAt = Instant.now();
   }
 
   public UUID getId() {
@@ -88,5 +101,17 @@ public class DeliveryAssignment {
 
   public AssignmentStatus getStatus() {
     return status;
+  }
+
+  public Instant getAssignedAt() {
+    return assignedAt;
+  }
+
+  public Instant getCompletedAt() {
+    return completedAt;
+  }
+
+  public Instant getCancelledAt() {
+    return cancelledAt;
   }
 }
