@@ -1,10 +1,13 @@
 package com.dispatchai.analytics.infrastructure.messaging;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
+import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
@@ -16,6 +19,7 @@ import org.springframework.kafka.support.serializer.JacksonJsonSerde;
 import com.dispatchai.analytics.domain.model.AnalyticsDeliveryStatus;
 import com.dispatchai.analytics.domain.model.DeliveryAnalyticsState;
 import com.dispatchai.analytics.domain.model.DeliveryStateUpdate;
+import com.dispatchai.analytics.domain.model.DriverPerformanceState;
 import com.dispatchai.analytics.infrastructure.messaging.event.DeliveryCancelledEvent;
 import com.dispatchai.analytics.infrastructure.messaging.event.DeliveryCompletedEvent;
 import com.dispatchai.analytics.infrastructure.messaging.event.DeliveryCreatedEvent;
@@ -125,17 +129,96 @@ public class DeliveryAnalyticsStreams {
   @Bean
   public Consumer<KStream<String, DeliveryStateUpdate>> deliveryStateAggregator() {
 
-    var stateSerde = new JacksonJsonSerde<>(DeliveryAnalyticsState.class);
+    var deliveryStateSerde = new JacksonJsonSerde<>(DeliveryAnalyticsState.class);
 
-    return input -> input
-        .groupByKey()
-        .aggregate(
-            DeliveryAnalyticsState::empty,
-            (deliveryId, update, state) -> state.apply(update),
-            Materialized
-                .<String, DeliveryAnalyticsState, KeyValueStore<Bytes, byte[]>>as(
-                    "delivery-state-store")
-                .withKeySerde(Serdes.String())
-                .withValueSerde(stateSerde));
+    var driverPerformanceSerde = new JacksonJsonSerde<>(DriverPerformanceState.class);
+
+    return input -> {
+
+      KTable<String, DeliveryAnalyticsState> deliveries = input
+          .groupByKey()
+          .aggregate(
+              DeliveryAnalyticsState::empty,
+              (deliveryId, update, state) -> state.apply(update),
+              Materialized
+                  .<String, DeliveryAnalyticsState, KeyValueStore<Bytes, byte[]>>as(
+                      "delivery-state-store")
+                  .withKeySerde(Serdes.String())
+                  .withValueSerde(deliveryStateSerde));
+
+      var driverDeliveries = deliveries
+          .filter((deliveryId, delivery) -> {
+            if (delivery != null && delivery.driverId() != null) {
+              System.out.println(
+                  "DRIVER CANDIDATE: delivery="
+                      + delivery.deliveryId()
+                      + ", driver="
+                      + delivery.driverId()
+                      + ", status="
+                      + delivery.status());
+            }
+
+            return delivery != null
+                && delivery.driverId() != null;
+          });
+
+      driverDeliveries
+          .groupBy(
+              (deliveryId, delivery) -> KeyValue.pair(
+                  delivery.driverId().toString(),
+                  delivery),
+              Grouped.with(
+                  Serdes.String(),
+                  deliveryStateSerde))
+          .aggregate(
+              () -> null,
+
+              (driverId, delivery, state) -> {
+                System.out.println(
+                    "ADD driver=" + driverId
+                        + " delivery=" + delivery.deliveryId()
+                        + " status=" + delivery.status()
+                        + " previousState=" + state);
+
+                var aggregate = state != null
+                    ? state
+                    : DriverPerformanceState.empty(
+                        UUID.fromString(driverId));
+
+                var result = aggregate.add(delivery);
+
+                System.out.println(
+                    "ADD RESULT driver=" + driverId
+                        + " state=" + result);
+
+                return result;
+              },
+
+              (driverId, delivery, state) -> {
+                System.out.println(
+                    "REMOVE driver=" + driverId
+                        + " delivery=" + delivery.deliveryId()
+                        + " status=" + delivery.status()
+                        + " previousState=" + state);
+
+                if (state == null) {
+                  return null;
+                }
+
+                var result = state.remove(delivery);
+
+                System.out.println(
+                    "REMOVE RESULT driver=" + driverId
+                        + " state=" + result);
+
+                return result;
+              },
+
+              Materialized
+                  .<String, DriverPerformanceState, KeyValueStore<Bytes, byte[]>>as(
+                      "driver-performance-store")
+                  .withKeySerde(Serdes.String())
+                  .withValueSerde(driverPerformanceSerde));
+    };
   }
 }

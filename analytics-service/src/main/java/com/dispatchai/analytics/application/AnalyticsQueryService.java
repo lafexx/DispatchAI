@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.dispatchai.analytics.domain.model.AnalyticsDeliveryStatus;
 import com.dispatchai.analytics.domain.model.DeliveryAnalyticsState;
+import com.dispatchai.analytics.domain.model.DriverPerformanceState;
 import com.dispatchai.analytics.presentation.dto.DeliverySummaryResponse;
 import com.dispatchai.analytics.presentation.dto.DriverAnalyticsResponse;
 
@@ -83,25 +84,25 @@ public class AnalyticsQueryService {
         .filter(d -> d.createdAt() != null && d.assignedAt() != null)
         .mapToLong(d -> Duration.between(
             d.createdAt(),
-            d.assignedAt()).toSeconds())
+            d.assignedAt()).toMillis())
         .average()
-        .orElse(0.0);
+        .orElse(0.0) / 1000.0;
 
     double averageDeliveryTimeSeconds = deliveries.stream()
         .filter(d -> d.createdAt() != null && d.completedAt() != null)
         .mapToLong(d -> Duration.between(
             d.createdAt(),
-            d.completedAt()).toSeconds())
+            d.completedAt()).toMillis())
         .average()
-        .orElse(0.0);
+        .orElse(0.0) / 1000.0;
 
     double averageTransitTimeSeconds = deliveries.stream()
         .filter(d -> d.startedAt() != null && d.completedAt() != null)
         .mapToLong(d -> Duration.between(
             d.startedAt(),
-            d.completedAt()).toSeconds())
+            d.completedAt()).toMillis())
         .average()
-        .orElse(0.0);
+        .orElse(0.0) / 1000.0;
 
     double completionRate = total == 0 ? 0.0 : (double) completed / total;
     double cancellationRate = total == 0 ? 0.0 : (double) cancelled / total;
@@ -125,52 +126,41 @@ public class AnalyticsQueryService {
   }
 
   public DriverAnalyticsResponse getDriverAnalytics(UUID driverId) {
-    var deliveries = getAllDeliveries().stream()
-        .filter(d -> driverId.equals(d.driverId()))
-        .toList();
+    var state = driverPerformanceStore()
+        .get(driverId.toString());
 
-    long completed = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.COMPLETED)
-        .count();
-
-    long cancelled = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.CANCELLED)
-        .count();
-
-    long delayed = deliveries.stream()
-        .filter(DeliveryAnalyticsState::delayed)
-        .count();
-
-    double averageDeliveryTimeSeconds = deliveries.stream()
-        .filter(d -> d.createdAt() != null && d.completedAt() != null)
-        .mapToLong(d -> Duration.between(
-            d.createdAt(),
-            d.completedAt()).toSeconds())
-        .average()
-        .orElse(0.0);
-
-    double averageTransitTimeSeconds = deliveries.stream()
-        .filter(d -> d.startedAt() != null && d.completedAt() != null)
-        .mapToLong(d -> Duration.between(
-            d.startedAt(),
-            d.completedAt()).toSeconds())
-        .average()
-        .orElse(0.0);
+    if (state == null) {
+      return new DriverAnalyticsResponse(
+          driverId,
+          0,
+          0,
+          0,
+          0,
+          0.0,
+          0.0);
+    }
 
     return new DriverAnalyticsResponse(
-        driverId,
-        deliveries.size(),
-        completed,
-        cancelled,
-        delayed,
-        averageDeliveryTimeSeconds,
-        averageTransitTimeSeconds);
+        state.driverId(),
+        state.totalAssigned(),
+        state.completed(),
+        state.cancelled(),
+        state.delayed(),
+        state.averageDeliveryTimeSeconds(),
+        state.averageTransitTimeSeconds());
   }
 
   private ReadOnlyKeyValueStore<String, DeliveryAnalyticsState> deliveryStateStore() {
 
     return interactiveQueryService.getQueryableStore(
         "delivery-state-store",
+        QueryableStoreTypes.keyValueStore());
+  }
+
+  private ReadOnlyKeyValueStore<String, DriverPerformanceState> driverPerformanceStore() {
+
+    return interactiveQueryService.getQueryableStore(
+        "driver-performance-store",
         QueryableStoreTypes.keyValueStore());
   }
 }
