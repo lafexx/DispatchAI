@@ -70,6 +70,12 @@ public class DriverApplicationService {
     return toResponse(driver);
   }
 
+  public List<DriverResponse> getAll() {
+    var drivers = repository.findAll();
+
+    return toResponse(drivers);
+  }
+
   private DriverResponse toResponse(Driver driver) {
     return new DriverResponse(driver.getId(), driver.getName(), driver.getAvailability());
   }
@@ -78,7 +84,7 @@ public class DriverApplicationService {
     List<DriverResponse> responses = new ArrayList<DriverResponse>();
 
     for (Driver driver : drivers) {
-      responses.add(new DriverResponse(driver.getId(), driver.getName(), driver.getAvailability()));
+      responses.add(toResponse(driver));
     }
 
     return responses;

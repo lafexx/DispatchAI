@@ -116,8 +116,8 @@ class NotificationApplicationServiceTest {
         eventId,
         UUID.randomUUID(),
         deliveryId,
-        customerId,
         UUID.randomUUID(),
+        customerId,
         null,
         Instant.now());
 

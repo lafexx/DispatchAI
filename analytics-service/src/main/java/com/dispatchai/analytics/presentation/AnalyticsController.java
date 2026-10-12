@@ -1,5 +1,6 @@
 package com.dispatchai.analytics.presentation;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -46,5 +47,10 @@ public class AnalyticsController {
       @PathVariable UUID driverId) {
 
     return queryService.getDriverAnalytics(driverId);
+  }
+
+  @GetMapping
+  public List<DeliveryAnalyticsState> getDeliveries() {
+    return queryService.getAllDeliveries();
   }
 }

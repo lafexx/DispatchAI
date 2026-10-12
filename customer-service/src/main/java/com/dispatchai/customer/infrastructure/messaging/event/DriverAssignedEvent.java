@@ -7,8 +7,8 @@ public record DriverAssignedEvent(
     UUID eventId,
     UUID assignmentId,
     UUID deliveryId,
-    UUID customerId,
     UUID driverId,
+    UUID customerId,
     UUID vehicleId,
     Instant occurredAt) {
 }

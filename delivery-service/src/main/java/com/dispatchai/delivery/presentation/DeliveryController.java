@@ -41,11 +41,6 @@ public class DeliveryController {
     return deliveryService.get(id);
   }
 
-  @PostMapping("/{id}/assign")
-  public DeliveryResponse assign(@PathVariable UUID id, @Valid @RequestBody AssignDeliveryRequest request) {
-    return deliveryService.assign(id, request.driverId());
-  }
-
   @PostMapping("/{id}/start")
   public DeliveryResponse start(@PathVariable UUID id) {
     return deliveryService.start(id);

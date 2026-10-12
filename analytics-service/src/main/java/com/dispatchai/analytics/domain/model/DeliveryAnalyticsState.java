@@ -33,54 +33,118 @@ public record DeliveryAnalyticsState(
         null);
   }
 
-  public DeliveryAnalyticsState apply(DeliveryStateUpdate update) {
+  public DeliveryAnalyticsState apply(
+      DeliveryStateUpdate update) {
+
+    var nextStatus = resolveStatus(status, update.status());
+
+    var nextDeliveryId = update.deliveryId() != null
+        ? update.deliveryId()
+        : deliveryId;
+
+    var nextCustomerId = update.customerId() != null
+        ? update.customerId()
+        : customerId;
+
+    var nextDriverId = update.driverId() != null
+        ? update.driverId()
+        : driverId;
+
+    var nextDelayed = update.delayed() != null
+        ? update.delayed()
+        : delayed;
+
+    var nextDelayMinutes = update.delayMinutes() != null
+        ? update.delayMinutes()
+        : delayMinutes;
+
+    var nextDelayReason = update.delayReason() != null
+        ? update.delayReason()
+        : delayReason;
+
+    var nextCreatedAt = createdAt;
+    var nextStartedAt = startedAt;
+    var nextCompletedAt = completedAt;
+    var nextCancelledAt = cancelledAt;
+    var nextAssignedAt = assignedAt;
+
+    if (update.status() == AnalyticsDeliveryStatus.PENDING &&
+        nextCreatedAt == null) {
+      nextCreatedAt = update.eventTime();
+    }
+
+    if (update.status() == AnalyticsDeliveryStatus.ASSIGNED &&
+        nextAssignedAt == null) {
+      nextAssignedAt = update.eventTime();
+    }
+
+    if (update.status() == AnalyticsDeliveryStatus.IN_TRANSIT &&
+        nextStartedAt == null) {
+      nextStartedAt = update.eventTime();
+    }
+
+    if (update.status() == AnalyticsDeliveryStatus.COMPLETED &&
+        nextCompletedAt == null) {
+      nextCompletedAt = update.eventTime();
+    }
+
+    if (update.status() == AnalyticsDeliveryStatus.CANCELLED &&
+        nextCancelledAt == null) {
+      nextCancelledAt = update.eventTime();
+    }
+
     return new DeliveryAnalyticsState(
-        update.deliveryId() != null
-            ? update.deliveryId()
-            : deliveryId,
+        nextDeliveryId,
+        nextCustomerId,
+        nextDriverId,
+        nextStatus,
+        nextDelayed,
+        nextDelayMinutes,
+        nextDelayReason,
+        nextCreatedAt,
+        nextStartedAt,
+        nextCompletedAt,
+        nextCancelledAt,
+        nextAssignedAt);
+  }
 
-        update.customerId() != null
-            ? update.customerId()
-            : customerId,
+  private static AnalyticsDeliveryStatus resolveStatus(
+      AnalyticsDeliveryStatus current,
+      AnalyticsDeliveryStatus incoming) {
 
-        update.driverId() != null
-            ? update.driverId()
-            : driverId,
+    if (incoming == null) {
+      return current;
+    }
 
-        update.status() != null
-            ? update.status()
-            : status,
+    if (current == null) {
+      return incoming;
+    }
 
-        update.delayed() != null
-            ? update.delayed()
-            : delayed,
+    // Terminal states cannot be downgraded.
+    if (current == AnalyticsDeliveryStatus.COMPLETED ||
+        current == AnalyticsDeliveryStatus.CANCELLED) {
+      return current;
+    }
 
-        update.delayMinutes() != null
-            ? update.delayMinutes()
-            : delayMinutes,
+    return switch (incoming) {
+      case PENDING -> current;
 
-        update.delayReason() != null
-            ? update.delayReason()
-            : delayReason,
+      case ASSIGNED ->
+        current == AnalyticsDeliveryStatus.PENDING
+            ? AnalyticsDeliveryStatus.ASSIGNED
+            : current;
 
-        update.status() == AnalyticsDeliveryStatus.PENDING
-            ? update.eventTime()
-            : createdAt,
+      case IN_TRANSIT ->
+        current == AnalyticsDeliveryStatus.PENDING ||
+            current == AnalyticsDeliveryStatus.ASSIGNED
+                ? AnalyticsDeliveryStatus.IN_TRANSIT
+                : current;
 
-        update.status() == AnalyticsDeliveryStatus.IN_TRANSIT
-            ? update.eventTime()
-            : startedAt,
+      case COMPLETED ->
+        AnalyticsDeliveryStatus.COMPLETED;
 
-        update.status() == AnalyticsDeliveryStatus.COMPLETED
-            ? update.eventTime()
-            : completedAt,
-
-        update.status() == AnalyticsDeliveryStatus.CANCELLED
-            ? update.eventTime()
-            : cancelledAt,
-
-        update.status() == AnalyticsDeliveryStatus.ASSIGNED
-            ? update.eventTime()
-            : assignedAt);
+      case CANCELLED ->
+        AnalyticsDeliveryStatus.CANCELLED;
+    };
   }
 }

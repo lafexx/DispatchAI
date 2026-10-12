@@ -44,27 +44,51 @@ public class DispatchApplicationService {
 
   public AssignmentResponse create(
       CreateAssignmentRequest request) {
-    var delivery = validateDeliveryCanBeAssigned(request.deliveryId());
 
-    if (repository.existsByDeliveryIdAndStatus(
+    return assign(
         request.deliveryId(),
-        AssignmentStatus.ACTIVE)) {
+        request.driverId(),
+        request.vehicleId());
+  }
 
-      throw new IllegalStateException(
-          "Delivery already has an active assignment");
+  public AssignmentResponse autoAssign(
+      UUID deliveryId,
+      UUID vehicleId) {
+
+    var drivers = fleetClient.getAvailableDrivers();
+
+    if (drivers == null || drivers.isEmpty()) {
+      throw new NoAvailableDriverException(
+          "No drivers are currently available");
     }
 
-    var driver = fleetClient.getDriver(request.driverId());
+    return assign(
+        deliveryId,
+        drivers.getFirst().id(),
+        vehicleId);
+  }
+
+  private AssignmentResponse assign(
+      UUID deliveryId,
+      UUID driverId,
+      UUID vehicleId) {
+
+    var delivery = validateDeliveryCanBeAssigned(deliveryId);
+
+    ensureNoActiveAssignment(deliveryId);
+
+    var driver = fleetClient.getDriver(driverId);
 
     if (!"AVAILABLE".equals(driver.availability())) {
-      throw new IllegalStateException("Driver is not available");
+      throw new IllegalStateException(
+          "Driver is not available");
     }
 
     var assignment = new DeliveryAssignment(
         UUID.randomUUID(),
-        request.deliveryId(),
-        request.driverId(),
-        request.vehicleId());
+        deliveryId,
+        driverId,
+        vehicleId);
 
     repository.save(assignment);
 
@@ -73,8 +97,8 @@ public class DispatchApplicationService {
             UUID.randomUUID(),
             assignment.getId(),
             assignment.getDeliveryId(),
-            delivery.customerId(),
             assignment.getDriverId(),
+            delivery.customerId(),
             assignment.getVehicleId(),
             Instant.now()));
 
@@ -101,36 +125,6 @@ public class DispatchApplicationService {
   public AssignmentResponse getByDeliveryId(UUID deliveryId) {
     var assignment = repository.findByDeliveryId(deliveryId)
         .orElseThrow(() -> new DeliveryNotFoundException(deliveryId));
-
-    return toResponse(assignment);
-  }
-
-  public AssignmentResponse autoAssign(UUID deliveryId, UUID vehicleId) {
-    var delivery = validateDeliveryCanBeAssigned(deliveryId);
-    ensureNoActiveAssignment(deliveryId);
-
-    var availableDrivers = fleetClient.getAvailableDrivers();
-
-    if (availableDrivers == null || availableDrivers.isEmpty()) {
-      throw new NoAvailableDriverException("No drivers are currently available");
-    }
-
-    var driver = availableDrivers.getFirst();
-
-    var assignment = new DeliveryAssignment(UUID.randomUUID(), deliveryId, driver.id(),
-        vehicleId);
-
-    repository.save(assignment);
-
-    eventPublisher.publish(
-        new DriverAssignedEvent(
-            UUID.randomUUID(),
-            assignment.getId(),
-            assignment.getDeliveryId(),
-            assignment.getDriverId(),
-            delivery.customerId(),
-            assignment.getVehicleId(),
-            Instant.now()));
 
     return toResponse(assignment);
   }

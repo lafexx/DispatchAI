@@ -50,4 +50,9 @@ public class DriverController {
       @Valid @RequestBody SetDriverAvailabilityRequest request) {
     return driverService.setAvailability(id, request);
   }
+
+  @GetMapping
+  public List<DriverResponse> getAll() {
+    return driverService.getAll();
+  }
 }
