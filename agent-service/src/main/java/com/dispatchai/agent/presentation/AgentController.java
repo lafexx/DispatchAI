@@ -5,23 +5,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dispatchai.agent.application.DispatchAdvisorAgent;
+import com.dispatchai.agent.application.DispatchAdvisorService;
 import com.dispatchai.agent.application.OperationsAgent;
 import com.dispatchai.agent.presentation.dto.AgentRequest;
 import com.dispatchai.agent.presentation.dto.AgentResponse;
+import com.dispatchai.agent.presentation.dto.DispatchAdviceRequest;
+import com.dispatchai.agent.presentation.dto.DispatchAdviceResponse;
 
 @RestController
 @RequestMapping("/api/agent")
 public class AgentController {
 
   private final OperationsAgent operationsAgent;
-  private final DispatchAdvisorAgent dispatchAdvisorAgent;
+  private final DispatchAdvisorService dispatchAdvisorService;
 
   public AgentController(
       OperationsAgent operationsAgent,
-      DispatchAdvisorAgent dispatchAdvisorAgent) {
+      DispatchAdvisorService dispatchAdvisorService) {
     this.operationsAgent = operationsAgent;
-    this.dispatchAdvisorAgent = dispatchAdvisorAgent;
+    this.dispatchAdvisorService = dispatchAdvisorService;
   }
 
   @PostMapping("/operations/query")
@@ -31,8 +33,10 @@ public class AgentController {
   }
 
   @PostMapping("/dispatch/advice")
-  public AgentResponse dispatchAdvice(@RequestBody AgentRequest request) {
-    return new AgentResponse(
-        dispatchAdvisorAgent.advise(request.message()));
+  public DispatchAdviceResponse dispatchAdvice(
+      @RequestBody DispatchAdviceRequest request) {
+
+    return dispatchAdvisorService.advise(
+        request.deliveryId());
   }
 }

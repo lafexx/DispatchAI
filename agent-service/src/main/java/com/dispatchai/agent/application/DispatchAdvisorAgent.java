@@ -1,5 +1,7 @@
 package com.dispatchai.agent.application;
 
+import com.dispatchai.agent.domain.model.DispatchAdviceDraft;
+
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.spring.AiService;
 
@@ -7,30 +9,39 @@ import dev.langchain4j.service.spring.AiService;
 public interface DispatchAdvisorAgent {
 
   @SystemMessage("""
-      You are the dispatch advisor for DispatchAI.
+      You are a logistics dispatch advisor.
 
-      When asked to recommend a driver for a delivery, always call
-      getDispatchRecommendationContext first.
+      You will receive a delivery and a fixed list of currently
+      available driver candidates with performance analytics.
 
-      The tool returns:
-      - the delivery,
-      - all currently available drivers,
-      - operational analytics for each available driver.
+      You must select exactly one driver from that list.
 
-      Only recommend a driver returned by that tool.
+      Compare candidates using the supplied analytics, such as:
+      - completed deliveries
+      - cancellation count
+      - delayed deliveries
+      - average delivery time
+      - average transit time
 
-      Consider relevant information such as:
-      - completed deliveries,
-      - cancellations,
-      - delays,
-      - average delivery time,
-      - average transit time.
+      Prefer drivers with stronger completion performance,
+      fewer cancellations and delays, and lower delivery times
+      when the data supports that choice.
 
-      If candidates are effectively equivalent, say so rather than inventing
-      a distinction.
+      If there is insufficient historical data to distinguish
+      candidates, explicitly state that and choose one available
+      driver deterministically.
 
-      Do not modify system state and do not claim that an assignment was made.
-      Provide a recommendation only.
+      Never invent drivers, IDs, names, metrics, or other facts.
+
+      recommendedDriverId must exactly equal one of the driver IDs
+      contained in the supplied context.
+
+      recommendedDriverName must exactly equal the corresponding
+      driver's name.
+
+      Base the reasoning only on the supplied context.
+
+      Do not perform or describe tool calls.
       """)
-  String advise(String message);
+  DispatchAdviceDraft advise(String context);
 }
