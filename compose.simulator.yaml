@@ -1,0 +1,37 @@
+# Place beside the project's existing docker-compose.yaml.
+services:
+  simulator:
+    profiles: [demo]
+    build: ./simulator
+    restart: "no"
+    init: true
+    stop_grace_period: 45s
+    environment:
+      CUSTOMER_URL: http://customer-service:8084
+      FLEET_URL: http://fleet-service:8082
+      DELIVERY_URL: http://delivery-service:8081
+      DISPATCH_URL: http://dispatch-service:8083
+      SIM_STATE_FILE: /data/state.json
+      SIM_SPEED: ${SIM_SPEED:-1}
+      SIM_ARRIVAL_SECONDS: ${SIM_ARRIVAL_SECONDS:-10}
+      SIM_TRANSIT_SECONDS: ${SIM_TRANSIT_SECONDS:-45}
+      SIM_DRIVERS: ${SIM_DRIVERS:-12}
+      SIM_INITIAL_DELIVERIES: ${SIM_INITIAL_DELIVERIES:-6}
+      SIM_PENDING_TARGET: ${SIM_PENDING_TARGET:-3}
+      SIM_MAX_ACTIVE: ${SIM_MAX_ACTIVE:-6}
+      SIM_MAX_TRACKED: ${SIM_MAX_TRACKED:-24}
+      SIM_MAX_DELIVERIES: ${SIM_MAX_DELIVERIES:-120}
+      SIM_DELAY_PROBABILITY: ${SIM_DELAY_PROBABILITY:-0.25}
+      SIM_CANCEL_PROBABILITY: ${SIM_CANCEL_PROBABILITY:-0.15}
+      SIM_RECYCLE_DRIVERS: ${SIM_RECYCLE_DRIVERS:-true}
+      SIM_SEED: ${SIM_SEED:-318}
+    volumes:
+      - simulator-state:/data
+    depends_on:
+      - customer-service
+      - fleet-service
+      - delivery-service
+      - dispatch-service
+
+volumes:
+  simulator-state:

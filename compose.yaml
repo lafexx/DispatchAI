@@ -148,19 +148,89 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
 
     depends_on:
-      - delivery-service
-      - fleet-service
-      - dispatch-service
-      - broker
+      delivery-service:
+        condition: service_started
+
+      fleet-service:
+        condition: service_started
+
+      dispatch-service:
+        condition: service_started
+
+      broker:
+        condition: service_started
+
+      ollama-warmup:
+        condition: service_completed_successfully
 
   ollama:
     image: ollama/ollama:latest
     container_name: dispatchai-ollama
     gpus: all
+ 
     ports:
       - "11434:11434"
+ 
     volumes:
       - ollama-data:/root/.ollama
+ 
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  ollama-warmup:
+    image: curlimages/curl:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - |
+        curl -sS http://ollama:11434/api/chat \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "model": "llama3.1:8b",
+            "messages": [
+              {
+                "role": "user",
+                "content": "Respond with OK."
+              }
+            ],
+            "stream": false,
+            "keep_alive": "24h",
+            "options": {
+              "num_predict": 1
+            }
+          }'
+
+  frontend:
+    build: ./frontend
+    container_name: dispatchai-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      DELIVERY_SERVICE_URL: http://delivery-service:8081
+      FLEET_SERVICE_URL: http://fleet-service:8082
+      DISPATCH_SERVICE_URL: http://dispatch-service:8083
+      ANALYTICS_SERVICE_URL: http://analytics-service:8085
+      AGENT_SERVICE_URL: http://agent-service:8086
+    depends_on:
+      - delivery-service
+      - fleet-service
+      - dispatch-service
+      - analytics-service
+      - agent-service
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   tools:
     image: alpine:3.22

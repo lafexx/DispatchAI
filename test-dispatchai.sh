@@ -11,8 +11,9 @@ set -euo pipefail
 #   CUSTOMER_URL=http://localhost:8084
 #   FLEET_URL=http://localhost:8082
 #   DELIVERY_URL=http://localhost:8081
+#   DISPATCH_URL=http://localhost:8083
 #   ANALYTICS_URL=http://localhost:8085
-#   AGENT_URL=http://localhost:8086
+#   AGENT_URL=http://localhost:8086#
 #
 # Usage:
 #   chmod +x test-dispatchai.sh
@@ -25,6 +26,7 @@ FLEET_URL="${FLEET_URL:-http://localhost:8082}"
 DELIVERY_URL="${DELIVERY_URL:-http://localhost:8081}"
 ANALYTICS_URL="${ANALYTICS_URL:-http://localhost:8085}"
 AGENT_URL="${AGENT_URL:-http://localhost:8086}"
+DISPATCH_URL="${DISPATCH_URL:-http://localhost:8083}"
 
 ASSIGNMENT_TIMEOUT_SECONDS="${ASSIGNMENT_TIMEOUT_SECONDS:-10}"
 ANALYTICS_WAIT_SECONDS="${ANALYTICS_WAIT_SECONDS:-3}"
@@ -68,26 +70,70 @@ get_json() {
   curl --fail-with-body -sS "$url"
 }
 
-wait_for_assignment() {
+manual_assign() {
   local delivery_id="$1"
+  local driver_id="$2"
+
+  local response
+
+  response="$(
+    post_json "$DISPATCH_URL/api/dispatch/assignments" "{
+      \"deliveryId\": \"$delivery_id\",
+      \"driverId\": \"$driver_id\",
+      \"vehicleId\": null
+    }"
+  )"
+
+  echo "$response" | jq >&2
+
+  jq -r '.driverId' <<<"$response"
+}
+
+auto_assign() {
+  local delivery_id="$1"
+  local response
+
+  response="$(
+    post_json "$DISPATCH_URL/api/dispatch/assignments/auto" "{
+      \"deliveryId\": \"$delivery_id\",
+      \"vehicleId\": null
+    }"
+  )"
+
+  echo "$response" | jq >&2
+
+  jq -r '.driverId' <<<"$response"
+}
+
+wait_for_delivery_assignment() {
+  local delivery_id="$1"
+  local expected_driver_id="${2:-}"
   local elapsed=0
   local response
   local driver_id
 
   while ((elapsed < ASSIGNMENT_TIMEOUT_SECONDS)); do
-    response="$(get_json "$DELIVERY_URL/api/deliveries/$delivery_id")"
-    driver_id="$(jq -r '.assignedDriverId // empty' <<<"$response")"
+    response="$(
+      get_json "$DELIVERY_URL/api/deliveries/$delivery_id"
+    )"
+
+    driver_id="$(
+      jq -r '.assignedDriverId // empty' <<<"$response"
+    )"
 
     if [[ -n "$driver_id" ]]; then
-      printf '%s\n' "$driver_id"
-      return 0
+      if [[ -z "$expected_driver_id" ||
+        "$driver_id" == "$expected_driver_id" ]]; then
+        printf '%s\n' "$driver_id"
+        return 0
+      fi
     fi
 
     sleep 1
     ((elapsed += 1))
   done
 
-  die "Delivery $delivery_id was not assigned within ${ASSIGNMENT_TIMEOUT_SECONDS}s"
+  die "Delivery $delivery_id did not receive expected assignment within ${ASSIGNMENT_TIMEOUT_SECONDS}s"
 }
 
 RUN_ID="$(date +%s)-$$"
@@ -97,6 +143,7 @@ cat <<EOF
 CUSTOMER_URL  = $CUSTOMER_URL
 FLEET_URL     = $FLEET_URL
 DELIVERY_URL  = $DELIVERY_URL
+DISPATCH_URL  = $DISPATCH_URL
 ANALYTICS_URL = $ANALYTICS_URL
 AGENT_URL     = $AGENT_URL
 RUN_ID        = $RUN_ID
@@ -147,10 +194,20 @@ DRIVER_2_ID="$(create_driver "Driver 2 - $RUN_ID")"
 DRIVER_3_ID="$(create_driver "Driver 3 - $RUN_ID")"
 DRIVER_4_ID="$(create_driver "Driver 4 - $RUN_ID")"
 DRIVER_5_ID="$(create_driver "Driver 5 - $RUN_ID")"
+DRIVER_6_ID="$(create_driver "Driver 6 - $RUN_ID")"
+DRIVER_7_ID="$(create_driver "Driver 7 - $RUN_ID")"
 
 section "Mark drivers available"
 
-for driver_id in "$DRIVER_1_ID" "$DRIVER_2_ID" "$DRIVER_3_ID" "$DRIVER_4_ID" "$DRIVER_5_ID"; do
+for driver_id in \
+  "$DRIVER_1_ID" \
+  "$DRIVER_2_ID" \
+  "$DRIVER_3_ID" \
+  "$DRIVER_4_ID" \
+  "$DRIVER_5_ID" \
+  "$DRIVER_6_ID" \
+  "$DRIVER_7_ID"; do
+
   post_json \
     "$FLEET_URL/api/drivers/$driver_id/availability" \
     '{"available":true}' | jq
@@ -173,9 +230,21 @@ DELIVERY_1_RESPONSE="$(
 echo "$DELIVERY_1_RESPONSE" | jq
 DELIVERY_1_ID="$(jq -r '.id' <<<"$DELIVERY_1_RESPONSE")"
 
-ASSIGNED_DRIVER_1="$(wait_for_assignment "$DELIVERY_1_ID")"
-echo "Assigned driver: $ASSIGNED_DRIVER_1"
+section "Manually assign Delivery 1"
 
+DISPATCHED_DRIVER_1="$(
+  manual_assign \
+    "$DELIVERY_1_ID" \
+    "$DRIVER_1_ID"
+)"
+
+ASSIGNED_DRIVER_1="$(
+  wait_for_delivery_assignment \
+    "$DELIVERY_1_ID" \
+    "$DRIVER_1_ID"
+)"
+
+echo "Assigned driver: $ASSIGNED_DRIVER_1"
 post_empty "$DELIVERY_URL/api/deliveries/$DELIVERY_1_ID/start" | jq
 post_empty "$DELIVERY_URL/api/deliveries/$DELIVERY_1_ID/complete" | jq
 
@@ -196,9 +265,19 @@ DELIVERY_2_RESPONSE="$(
 echo "$DELIVERY_2_RESPONSE" | jq
 DELIVERY_2_ID="$(jq -r '.id' <<<"$DELIVERY_2_RESPONSE")"
 
-ASSIGNED_DRIVER_2="$(wait_for_assignment "$DELIVERY_2_ID")"
-echo "Assigned driver: $ASSIGNED_DRIVER_2"
+section "Auto assign Delivery 2"
 
+DISPATCHED_DRIVER_2="$(
+  auto_assign "$DELIVERY_2_ID"
+)"
+
+ASSIGNED_DRIVER_2="$(
+  wait_for_delivery_assignment \
+    "$DELIVERY_2_ID" \
+    "$DISPATCHED_DRIVER_2"
+)"
+
+echo "Assigned driver: $ASSIGNED_DRIVER_2"
 post_empty "$DELIVERY_URL/api/deliveries/$DELIVERY_2_ID/start" | jq
 
 post_json \
@@ -225,7 +304,20 @@ DELIVERY_3_RESPONSE="$(
 echo "$DELIVERY_3_RESPONSE" | jq
 DELIVERY_3_ID="$(jq -r '.id' <<<"$DELIVERY_3_RESPONSE")"
 
-ASSIGNED_DRIVER_3="$(wait_for_assignment "$DELIVERY_3_ID")"
+section "Manually assign Delivery 3"
+
+DISPATCHED_DRIVER_3="$(
+  manual_assign \
+    "$DELIVERY_3_ID" \
+    "$DRIVER_3_ID"
+)"
+
+ASSIGNED_DRIVER_3="$(
+  wait_for_delivery_assignment \
+    "$DELIVERY_3_ID" \
+    "$DRIVER_3_ID"
+)"
+
 echo "Assigned driver: $ASSIGNED_DRIVER_3"
 
 post_json \
@@ -234,6 +326,28 @@ post_json \
     "reason": "CUSTOMER_REQUEST",
     "notes": "Customer cancelled the delivery"
   }' | jq
+
+# ---------------------------------------------------------------------------
+# Delivery 4: intentionally left pending
+# ---------------------------------------------------------------------------
+
+section "Delivery 4: create -> pending"
+
+DELIVERY_4_RESPONSE="$(
+  post_json "$DELIVERY_URL/api/deliveries" "{
+    \"customerId\": \"$CUSTOMER_ID\",
+    \"pickupAddress\": \"120 Clarence St\",
+    \"destinationAddress\": \"55 York St\"
+  }"
+)"
+
+echo "$DELIVERY_4_RESPONSE" | jq
+
+DELIVERY_4_ID="$(
+  jq -r '.id' <<<"$DELIVERY_4_RESPONSE"
+)"
+
+echo "Leaving delivery $DELIVERY_4_ID in PENDING state for frontend dispatch testing."
 
 # ---------------------------------------------------------------------------
 # Give Kafka Streams a short period to materialize the latest events.
@@ -268,19 +382,31 @@ get_json \
   "$ANALYTICS_URL/api/analytics/deliveries/drivers/$ASSIGNED_DRIVER_1" |
   jq
 
-# Basic projection assertions. These are >= checks because the Analytics
-# state store may contain records from previous test runs.
 TOTAL="$(jq -r '.total' <<<"$SUMMARY")"
+PENDING="$(jq -r '.pending' <<<"$SUMMARY")"
+ASSIGNED="$(jq -r '.assigned' <<<"$SUMMARY")"
 COMPLETED="$(jq -r '.completed' <<<"$SUMMARY")"
 IN_TRANSIT="$(jq -r '.inTransit' <<<"$SUMMARY")"
 CANCELLED="$(jq -r '.cancelled' <<<"$SUMMARY")"
 DELAYED="$(jq -r '.delayed' <<<"$SUMMARY")"
 
-((TOTAL >= 3)) || die "Expected analytics total >= 3, got $TOTAL"
-((COMPLETED >= 1)) || die "Expected completed >= 1, got $COMPLETED"
-((IN_TRANSIT >= 1)) || die "Expected inTransit >= 1, got $IN_TRANSIT"
-((CANCELLED >= 1)) || die "Expected cancelled >= 1, got $CANCELLED"
-((DELAYED >= 1)) || die "Expected delayed >= 1, got $DELAYED"
+((TOTAL >= 4)) ||
+  die "Expected analytics total >= 4, got $TOTAL"
+
+((PENDING >= 1)) ||
+  die "Expected pending >= 1, got $PENDING"
+
+((COMPLETED >= 1)) ||
+  die "Expected completed >= 1, got $COMPLETED"
+
+((IN_TRANSIT >= 1)) ||
+  die "Expected inTransit >= 1, got $IN_TRANSIT"
+
+((CANCELLED >= 1)) ||
+  die "Expected cancelled >= 1, got $CANCELLED"
+
+((DELAYED >= 1)) ||
+  die "Expected delayed >= 1, got $DELAYED"
 
 echo "Analytics assertions passed."
 
@@ -336,14 +462,52 @@ post_json \
   }" |
   jq
 
-section "Dispatch Advisor Agent: recommend driver"
+section "Dispatch Advisor Agent: recommend driver for pending delivery"
 
-post_json \
-  "$AGENT_URL/api/agent/dispatch/advice" \
-  "{
-    \"message\": \"Which available driver would you recommend for delivery $DELIVERY_2_ID?\"
-  }" |
-  jq
+DISPATCH_ADVICE="$(
+  post_json \
+    "$AGENT_URL/api/agent/dispatch/advice" \
+    "{
+      \"deliveryId\": \"$DELIVERY_4_ID\"
+    }"
+)"
+
+echo "$DISPATCH_ADVICE" | jq
+
+RECOMMENDED_DRIVER_ID="$(
+  jq -r '.recommendedDriverId // empty' \
+    <<<"$DISPATCH_ADVICE"
+)"
+
+RECOMMENDED_DRIVER_NAME="$(
+  jq -r '.recommendedDriverName // empty' \
+    <<<"$DISPATCH_ADVICE"
+)"
+
+REASONING="$(
+  jq -r '.reasoning // empty' \
+    <<<"$DISPATCH_ADVICE"
+)"
+
+[[ -n "$RECOMMENDED_DRIVER_ID" ]] ||
+  die "Dispatch advisor did not return recommendedDriverId"
+
+[[ -n "$RECOMMENDED_DRIVER_NAME" ]] ||
+  die "Dispatch advisor did not return recommendedDriverName"
+
+[[ -n "$REASONING" ]] ||
+  die "Dispatch advisor did not return reasoning"
+
+AVAILABLE_DRIVERS="$(
+  get_json "$FLEET_URL/api/drivers/available"
+)"
+
+jq -e \
+  --arg driverId "$RECOMMENDED_DRIVER_ID" \
+  'any(.[]; .id == $driverId)' \
+  <<<"$AVAILABLE_DRIVERS" \
+  >/dev/null ||
+  die "Dispatch advisor recommended unavailable driver $RECOMMENDED_DRIVER_ID"
 
 # ---------------------------------------------------------------------------
 # Final IDs for manual follow-up
@@ -357,14 +521,22 @@ CUSTOMER_ID=$CUSTOMER_ID
 DRIVER_1_ID=$DRIVER_1_ID
 DRIVER_2_ID=$DRIVER_2_ID
 DRIVER_3_ID=$DRIVER_3_ID
+DRIVER_4_ID=$DRIVER_4_ID
+DRIVER_5_ID=$DRIVER_5_ID
+DRIVER_6_ID=$DRIVER_6_ID
+DRIVER_7_ID=$DRIVER_7_ID
 
 DELIVERY_1_ID=$DELIVERY_1_ID
 DELIVERY_2_ID=$DELIVERY_2_ID
 DELIVERY_3_ID=$DELIVERY_3_ID
+DELIVERY_4_ID=$DELIVERY_4_ID
 
 ASSIGNED_DRIVER_1=$ASSIGNED_DRIVER_1
 ASSIGNED_DRIVER_2=$ASSIGNED_DRIVER_2
 ASSIGNED_DRIVER_3=$ASSIGNED_DRIVER_3
+
+PENDING_DELIVERY_ID=$DELIVERY_4_ID
+RECOMMENDED_DRIVER_ID=$RECOMMENDED_DRIVER_ID
 EOF
 
 section "Done"
