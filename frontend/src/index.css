@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(58.5% 0.233 277.117);
+  --color-primary-foreground: oklch(1 0 0);
+  --color-secondary: oklch(0.67 0.18 276.95);
+  --color-secondary-foreground: oklch(0.92 0 0);
+
+  --color-success: oklch(0.5756 0.1176 147.83);
+  --color-warning: oklch(0.5756 0.1176 91.67);
+  --color-destructive: oklch(0.64 0.21 25.39);
+
+  --color-background: #0a0908;
+  --color-foreground: oklch(0.92 0 0);
+  --color-card: #0a0908;
+  --color-card-foreground: oklch(0.92 0 0);
+  --color-popover: oklch(0.27 0 0);
+  --color-popover-foreground: oklch(0.92 0 0);
+
+  --color-muted: oklch(0.26 0.01 255.58);
+  --color-muted-foreground: oklch(0.68 0 0);
+  --color-accent: oklch(58.5% 0.233 277.117);
+  --color-accent-foreground: oklch(0.93 0 0);
+  --color-border: oklch(0.3 0.01 268.37);
+  --color-input: #161618;
+  --color-input-hover: #1f1f21;
+  --color-input-active: #29292b;
+  --color-ring: oklch(0.58 0.14 327.21);
+
+  --color-chart-1: oklch(0.3563 0.0803 277.12);
+  --color-chart-2: oklch(0.4683 0.1107 277.12);
+  --color-chart-3: oklch(0.6015 0.1346 277.12);
+  --color-chart-4: oklch(0.585 0.233 277.117);
+  --color-chart-5: oklch(58.5% 0.233 277.117);
+
+  --breakpoint-tablet: 40rem;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px var(--glow-color);
+  }
+
+  .glow-sm {
+    box-shadow:
+      0 0 6px var(--glow-color),
+      0 0 8px var(--glow-color);
+  }
+
+  .glow-md {
+    box-shadow:
+      0 0 6px var(--glow-color),
+      0 0 18px var(--glow-color);
+  }
+
+  .glow-lg {
+    box-shadow:
+      0 0 8px var(--glow-color),
+      0 0 30px var(--glow-color),
+      0 0 60px var(--glow-color);
+  }
+
+  .vertical-rl {
+    writing-mode: vertical-rl;
+  }
+
+  .text-upright {
+    text-orientation: upright;
+  }
+
+  .text-mixed {
+    text-orientation: mixed;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+    animation: shimmer 1.6s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+::selection {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+@custom-variant h-sm {
+  @media (min-height: 600px) {
+    @slot;
+  }
+}
+
+@custom-variant h-md {
+  @media (min-height: 800px) {
+    @slot;
+  }
+}
+
+@custom-variant h-lg {
+  @media (min-height: 1000px) {
+    @slot;
+  }
+}
