@@ -1,9 +1,9 @@
-package com.dispatchai.dispatch.infrastructure.messaging;
+package com.dispatchai.fleet.infrastructure.messaging.event;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record DriverAssignedEvent(
+public record DeliveryAssignedEvent(
     UUID eventId,
     UUID assignmentId,
     UUID deliveryId,

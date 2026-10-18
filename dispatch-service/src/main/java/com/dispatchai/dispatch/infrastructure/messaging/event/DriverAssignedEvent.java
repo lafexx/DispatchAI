@@ -1,4 +1,4 @@
-package com.dispatchai.fleet.infrastructure.messaging;
+package com.dispatchai.dispatch.infrastructure.messaging.event;
 
 import java.time.Instant;
 import java.util.UUID;

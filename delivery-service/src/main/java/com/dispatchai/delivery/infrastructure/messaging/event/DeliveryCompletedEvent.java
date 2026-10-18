@@ -1,9 +1,9 @@
-package com.dispatchai.delivery.infrastructure.messaging.events;
+package com.dispatchai.delivery.infrastructure.messaging.event;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record DeliveryStartedEvent(
+public record DeliveryCompletedEvent(
     UUID eventId,
     UUID deliveryId,
     UUID customerId,
