@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dispatchai.agent.application.DispatchAdvisorService;
-import com.dispatchai.agent.application.OperationsAgent;
+import com.dispatchai.agent.infrastructure.ai.agent.OperationsAgent;
 import com.dispatchai.agent.presentation.dto.AgentRequest;
 import com.dispatchai.agent.presentation.dto.AgentResponse;
 import com.dispatchai.agent.presentation.dto.DispatchAdviceRequest;
@@ -27,14 +27,14 @@ public class AgentController {
   }
 
   @PostMapping("/operations/query")
-  public AgentResponse query(@RequestBody AgentRequest request) {
+  public AgentResponse query(@jakarta.validation.Valid @RequestBody AgentRequest request) {
     return new AgentResponse(
         operationsAgent.chat(request.message()));
   }
 
   @PostMapping("/dispatch/advice")
   public DispatchAdviceResponse dispatchAdvice(
-      @RequestBody DispatchAdviceRequest request) {
+      @jakarta.validation.Valid @RequestBody DispatchAdviceRequest request) {
 
     return dispatchAdvisorService.advise(
         request.deliveryId());

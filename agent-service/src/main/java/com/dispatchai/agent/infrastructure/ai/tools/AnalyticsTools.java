@@ -4,10 +4,10 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.dispatchai.agent.infrastructure.client.AnalyticsClient;
-import com.dispatchai.agent.infrastructure.client.dto.DeliveryAnalyticsResponse;
-import com.dispatchai.agent.infrastructure.client.dto.DeliverySummaryResponse;
-import com.dispatchai.agent.infrastructure.client.dto.DriverAnalyticsResponse;
+import com.dispatchai.agent.infrastructure.client.analytics.AnalyticsClient;
+import com.dispatchai.agent.infrastructure.client.analytics.dto.DeliveryAnalyticsResponse;
+import com.dispatchai.agent.infrastructure.client.analytics.dto.DeliverySummaryResponse;
+import com.dispatchai.agent.infrastructure.client.analytics.dto.DriverAnalyticsResponse;
 
 import dev.langchain4j.agent.tool.Tool;
 

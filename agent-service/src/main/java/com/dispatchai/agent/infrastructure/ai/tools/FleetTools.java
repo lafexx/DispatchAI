@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.dispatchai.agent.infrastructure.client.FleetClient;
-import com.dispatchai.agent.infrastructure.client.dto.DriverResponse;
+import com.dispatchai.agent.infrastructure.client.fleet.FleetClient;
+import com.dispatchai.agent.infrastructure.client.fleet.dto.DriverResponse;
 
 import dev.langchain4j.agent.tool.Tool;
 

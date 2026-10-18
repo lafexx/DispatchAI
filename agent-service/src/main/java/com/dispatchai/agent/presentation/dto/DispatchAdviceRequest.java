@@ -3,5 +3,5 @@ package com.dispatchai.agent.presentation.dto;
 import java.util.UUID;
 
 public record DispatchAdviceRequest(
-    UUID deliveryId) {
+    @jakarta.validation.constraints.NotNull UUID deliveryId) {
 }

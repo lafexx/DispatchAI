@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.dispatchai.agent.infrastructure.client.DeliveryClient;
-import com.dispatchai.agent.infrastructure.client.dto.DeliveryResponse;
+import com.dispatchai.agent.infrastructure.client.delivery.DeliveryClient;
+import com.dispatchai.agent.infrastructure.client.delivery.dto.DeliveryResponse;
 
 import dev.langchain4j.agent.tool.Tool;
 
