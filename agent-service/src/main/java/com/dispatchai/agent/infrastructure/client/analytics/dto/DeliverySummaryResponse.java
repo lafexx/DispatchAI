@@ -1,4 +1,4 @@
-package com.dispatchai.agent.infrastructure.client.dto;
+package com.dispatchai.agent.infrastructure.client.analytics.dto;
 
 public record DeliverySummaryResponse(
     long total,

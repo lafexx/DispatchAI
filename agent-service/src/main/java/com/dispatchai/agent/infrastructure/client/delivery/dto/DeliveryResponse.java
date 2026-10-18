@@ -1,4 +1,4 @@
-package com.dispatchai.agent.infrastructure.client.dto;
+package com.dispatchai.agent.infrastructure.client.delivery.dto;
 
 import java.util.UUID;
 
@@ -11,5 +11,5 @@ public record DeliveryResponse(
     String status,
     boolean delayed,
     Integer delayMinutes,
-    String delayReason) {
+    String delayReason, java.math.BigDecimal parcelWeightKg) {
 }

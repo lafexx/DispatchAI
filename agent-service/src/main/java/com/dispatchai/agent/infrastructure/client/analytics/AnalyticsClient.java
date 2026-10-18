@@ -1,4 +1,4 @@
-package com.dispatchai.agent.infrastructure.client;
+package com.dispatchai.agent.infrastructure.client.analytics;
 
 import java.util.UUID;
 
@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.dispatchai.agent.infrastructure.client.dto.DeliveryAnalyticsResponse;
-import com.dispatchai.agent.infrastructure.client.dto.DeliverySummaryResponse;
-import com.dispatchai.agent.infrastructure.client.dto.DriverAnalyticsResponse;
+import com.dispatchai.agent.infrastructure.client.analytics.dto.DeliveryAnalyticsResponse;
+import com.dispatchai.agent.infrastructure.client.analytics.dto.DeliverySummaryResponse;
+import com.dispatchai.agent.infrastructure.client.analytics.dto.DriverAnalyticsResponse;
 
 @Component
 public class AnalyticsClient {
@@ -19,7 +19,10 @@ public class AnalyticsClient {
       RestClient.Builder builder,
       @Value("${services.analytics.base-url}") String baseUrl) {
 
-    this.client = builder
+    var factory = new org.springframework.http.client.JdkClientHttpRequestFactory(
+        java.net.http.HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(3)).build());
+    factory.setReadTimeout(java.time.Duration.ofSeconds(5));
+    this.client = builder.requestFactory(factory)
         .baseUrl(baseUrl)
         .build();
   }

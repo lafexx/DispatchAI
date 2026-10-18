@@ -1,4 +1,6 @@
-package com.dispatchai.dispatch.infrastructure.delivery;
+package com.dispatchai.dispatch.infrastructure.client.delivery;
+
+import com.dispatchai.dispatch.infrastructure.client.delivery.dto.DeliveryResponse;
 
 import java.util.UUID;
 
@@ -7,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
-import com.dispatchai.dispatch.domain.model.exceptions.DeliveryNotFoundException;
+import com.dispatchai.dispatch.domain.exception.DeliveryNotFoundException;
 
 @Component
 public class DeliveryClient {

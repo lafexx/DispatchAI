@@ -1,4 +1,4 @@
-package com.dispatchai.agent.infrastructure.client.dto;
+package com.dispatchai.agent.infrastructure.client.analytics.dto;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -15,5 +15,6 @@ public record DeliveryAnalyticsResponse(
     Instant assignedAt,
     Instant startedAt,
     Instant completedAt,
-    Instant cancelledAt) {
+    Instant cancelledAt,
+    Instant lastDelayAt) {
 }
