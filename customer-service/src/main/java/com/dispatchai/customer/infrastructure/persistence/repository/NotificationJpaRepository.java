@@ -1,4 +1,4 @@
-package com.dispatchai.customer.infrastructure.persistence;
+package com.dispatchai.customer.infrastructure.persistence.repository;
 
 import java.util.List;
 import java.util.UUID;
