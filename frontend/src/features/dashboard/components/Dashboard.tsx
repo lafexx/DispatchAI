@@ -1,151 +1,182 @@
+import { Link } from "react-router";
+import { useDeliverySummary, useDeliveries } from "@/features/deliveries/hooks";
+import { useDrivers } from "@/features/drivers/hooks";
+import { useCustomers, useVehicles } from "@/lib/queries";
+import { PageHeader, Panel, Notice, Loading } from "@/components/UI";
+import { MetricCard } from "@/components/MetricCard";
+import { DeliveryTable } from "@/components/DeliveryTable";
+import { Icon } from "@/components/Icon";
 import {
-  AgentPanel,
-  DeliveryTable,
-  DriverTable,
-  MetricCard,
-} from "@/components";
-
-import {
-  useDeliveries,
-  useDeliverySummary,
-} from "@/features/deliveries/hooks";
-
-import {
-  useDrivers,
-} from "@/features/drivers/hooks";
-
-function percentage(value: number) {
-  return `${(value * 100).toFixed(1)}%`;
-}
-
+  TrendChart,
+  LifecycleChart,
+} from "@/features/analytics/components/AnalyticsCharts";
+import { number, percent, duration, activeStatus } from "@/lib/format";
 export function Dashboard() {
   const summary = useDeliverySummary();
   const deliveries = useDeliveries();
   const drivers = useDrivers();
-
-  const isLoading =
-    summary.isLoading ||
-    deliveries.isLoading ||
-    drivers.isLoading;
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-64 items-center justify-center text-sm text-zinc-500">
-        Loading operational data...
-      </div>
-    );
-  }
-
-  if (
-    summary.isError ||
-    deliveries.isError ||
-    drivers.isError
-  ) {
-    return (
-      <div className="rounded-xl border border-red-900 bg-red-950/30 p-6 text-red-300">
-        Failed to load dashboard data.
-      </div>
-    );
-  }
-
-  const summaryData = summary.data;
-  const deliveryData = deliveries.data ?? [];
-  const driverData = drivers.data ?? [];
-
-  const activeDeliveries =
-    (summaryData?.assigned ?? 0) +
-    (summaryData?.inTransit ?? 0);
-
+  const vehicles = useVehicles();
+  const customers = useCustomers();
+  const s = summary.data;
+  const availableDrivers = drivers.data?.filter(
+    (d) => d.availability === "AVAILABLE",
+  ).length;
+  const availableVehicles = vehicles.data?.filter((v) => v.available).length;
+  const attention = (deliveries.data ?? []).filter(
+    (d) => activeStatus(d.status) && d.delayed,
+  ).length;
+  const recent = [...(deliveries.data ?? [])]
+    .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
+    .slice(0, 5);
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
-          Operations dashboard
-        </h1>
-
-        <p className="mt-1 text-sm text-zinc-500">
-          Live delivery, fleet, analytics, and agent
-          state.
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="stack">
+      <PageHeader
+        eyebrow="YOUR OPERATION, AT A GLANCE"
+        title="Operations overview"
+        description="A clear view of demand, delivery performance, and the resources ready to move."
+        actions={
+          <Link className="button button-primary" to="/deliveries?create=1">
+            <Icon name="plus" size={16} />
+            New delivery
+          </Link>
+        }
+      />
+      {(summary.isError ||
+        deliveries.isError ||
+        drivers.isError ||
+        vehicles.isError) && (
+        <Notice tone="warning">
+          Some operational data could not be refreshed. Available figures are
+          shown below; unavailable figures appear as —.
+        </Notice>
+      )}
+      <div className="grid-four">
         <MetricCard
           label="Total deliveries"
-          value={summaryData?.total ?? 0}
+          value={s ? number(s.total) : "—"}
+          description="All recorded deliveries"
+          icon="package"
         />
-
         <MetricCard
           label="Active deliveries"
-          value={activeDeliveries}
-          description="Assigned or currently in transit"
-        />
-
-        <MetricCard
-          label="Completed"
-          value={summaryData?.completed ?? 0}
+          value={s ? number(s.assigned + s.inTransit) : "—"}
           description={
-            summaryData
-              ? `${percentage(summaryData.completionRate)} completion rate`
-              : undefined
+            s ? `${s.pending} pending dispatch` : "Assigned or in transit"
           }
+          icon="truck"
+          tone="blue"
         />
-
         <MetricCard
-          label="Delayed"
-          value={summaryData?.delayed ?? 0}
+          label="Completion rate"
+          value={s && s.total ? percent(s.completionRate) : "—"}
           description={
-            summaryData
-              ? `${summaryData.averageDelayMinutes.toFixed(1)} min average`
-              : undefined
+            s
+              ? `${number(s.completed)} deliveries completed`
+              : "Share of all recorded deliveries"
           }
+          icon="check"
+          tone="purple"
+        />
+        <MetricCard
+          label="Active delays"
+          value={deliveries.data ? number(attention) : "—"}
+          description="Open deliveries needing attention"
+          icon="clock"
+          tone="amber"
         />
       </div>
-
-      <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-        <DeliveryTable
-          deliveries={deliveryData}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
-          <MetricCard
-            label="Completion rate"
-            value={
-              summaryData
-                ? percentage(
-                  summaryData.completionRate,
-                )
-                : "—"
+      <div className="overview-grid">
+        <div className="stack">
+          <TrendChart metric="throughput" />
+          <Panel
+            title="Needs attention"
+            subtitle="Open work that may need an operator"
+          >
+            <div className="panel-body-topless">
+              <Link to="/dispatch" className="attention-item">
+                <span className="attention-bullet">
+                  <Icon name="dispatch" size={16} />
+                </span>
+                <div>
+                  <strong>
+                    {s
+                      ? `${s.pending} deliveries awaiting dispatch`
+                      : "Dispatch queue"}
+                  </strong>
+                  <p>Review eligible resources or request AI advice</p>
+                </div>
+                <Icon name="arrow" size={15} />
+              </Link>
+              <Link to="/deliveries?status=delayed" className="attention-item">
+                <span className="attention-bullet">
+                  <Icon name="alert" size={16} />
+                </span>
+                <div>
+                  <strong>
+                    {deliveries.data
+                      ? `${attention} active deliveries delayed`
+                      : "Delayed deliveries"}
+                  </strong>
+                  <p>Review the reported delay and next action</p>
+                </div>
+                <Icon name="arrow" size={15} />
+              </Link>
+            </div>
+          </Panel>
+        </div>
+        <div className="stack">
+          <LifecycleChart summary={s} compact error={summary.isError} />
+          <Panel
+            title="Resource availability"
+            action={
+              <Link to="/fleet" className="link-button">
+                View fleet <Icon name="arrow" size={13} />
+              </Link>
             }
-          />
-
-          <MetricCard
-            label="Cancellation rate"
-            value={
-              summaryData
-                ? percentage(
-                  summaryData.cancellationRate,
-                )
-                : "—"
-            }
-          />
-
-          <MetricCard
-            label="Delay rate"
-            value={
-              summaryData
-                ? percentage(
-                  summaryData.delayRate,
-                )
-                : "—"
-            }
-          />
+          >
+            <div className="panel-body-topless">
+              <div className="stat-row">
+                <span>Drivers ready</span>
+                <strong className="text-mint">
+                  {availableDrivers ?? "—"}{" "}
+                  <small className="muted">
+                    / {drivers.data?.length ?? "—"}
+                  </small>
+                </strong>
+              </div>
+              <div className="stat-row">
+                <span>Vehicles ready</span>
+                <strong className="text-blue">
+                  {availableVehicles ?? "—"}{" "}
+                  <small className="muted">
+                    / {vehicles.data?.length ?? "—"}
+                  </small>
+                </strong>
+              </div>
+              <div className="stat-row">
+                <span>Avg assignment time</span>
+                <strong>{duration(s?.averageAssignmentTimeSeconds)}</strong>
+              </div>
+            </div>
+          </Panel>
         </div>
       </div>
-
-      <DriverTable drivers={driverData} />
-
-      <AgentPanel />
+      {deliveries.isPending ? (
+        <Loading label="Loading recent deliveries…" />
+      ) : (
+        <DeliveryTable
+          title="Recent deliveries"
+          subtitle="Latest additions to the operation"
+          deliveries={recent}
+          drivers={drivers.data}
+          customers={customers.data}
+          action={
+            <Link className="link-button" to="/deliveries">
+              View all deliveries <Icon name="arrow" size={13} />
+            </Link>
+          }
+        />
+      )}
     </div>
   );
 }
