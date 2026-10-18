@@ -23,6 +23,20 @@ public class Driver {
   @Column(nullable = false)
   private DriverAvailability availability;
 
+  @Column(nullable = false)
+  private int activeAssignmentCount;
+
+  public void assignmentStarted() { activeAssignmentCount++; }
+
+  public void assignmentFinished() {
+    if (activeAssignmentCount <= 0) {
+      throw new IllegalStateException("Assignment occupancy is already zero");
+    }
+    activeAssignmentCount--;
+  }
+
+  public int getActiveAssignmentCount() { return activeAssignmentCount; }
+
   protected Driver() {
   }
 
@@ -49,7 +63,7 @@ public class Driver {
   }
 
   public boolean isAvailable() {
-    return availability == DriverAvailability.AVAILABLE;
+    return getAvailability() == DriverAvailability.AVAILABLE;
   }
 
   public UUID getId() {
@@ -61,6 +75,6 @@ public class Driver {
   }
 
   public DriverAvailability getAvailability() {
-    return availability;
+    return activeAssignmentCount > 0 ? DriverAvailability.UNAVAILABLE : availability;
   }
 }

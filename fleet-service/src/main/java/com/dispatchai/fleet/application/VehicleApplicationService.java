@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dispatchai.fleet.domain.model.Vehicle;
-import com.dispatchai.fleet.domain.model.exceptions.VehicleNotFoundException;
-import com.dispatchai.fleet.infrastructure.persistence.VehicleJpaRepository;
+import com.dispatchai.fleet.domain.exception.VehicleNotFoundException;
+import com.dispatchai.fleet.infrastructure.persistence.repository.VehicleJpaRepository;
 import com.dispatchai.fleet.presentation.dto.CreateVehicleRequest;
 import com.dispatchai.fleet.presentation.dto.SetVehicleAvailabilityRequest;
 import com.dispatchai.fleet.presentation.dto.VehicleResponse;
@@ -42,8 +43,9 @@ public class VehicleApplicationService {
     return toResponse(vehicles);
   }
 
+  @Transactional
   public VehicleResponse setAvailability(UUID id, SetVehicleAvailabilityRequest request) {
-    var vehicle = repository.findById(id)
+    var vehicle = repository.findByIdForUpdate(id)
         .orElseThrow(() -> new VehicleNotFoundException(id));
 
     if (request.available()) {

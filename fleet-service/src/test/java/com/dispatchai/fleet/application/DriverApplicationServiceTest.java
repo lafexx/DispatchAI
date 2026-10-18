@@ -20,8 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.dispatchai.fleet.domain.model.Driver;
 import com.dispatchai.fleet.domain.model.DriverAvailability;
-import com.dispatchai.fleet.domain.model.exceptions.DriverNotFoundException;
-import com.dispatchai.fleet.infrastructure.persistence.DriverJpaRepository;
+import com.dispatchai.fleet.domain.exception.DriverNotFoundException;
+import com.dispatchai.fleet.infrastructure.persistence.repository.DriverJpaRepository;
 import com.dispatchai.fleet.presentation.dto.CreateDriverRequest;
 import com.dispatchai.fleet.presentation.dto.SetDriverAvailabilityRequest;
 
@@ -162,7 +162,7 @@ class DriverApplicationServiceTest {
         id,
         "Alex Smith");
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(driver));
 
     var request = new SetDriverAvailabilityRequest(true);
@@ -186,7 +186,7 @@ class DriverApplicationServiceTest {
 
     driver.markAvailable();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(driver));
 
     var request = new SetDriverAvailabilityRequest(false);
@@ -204,7 +204,7 @@ class DriverApplicationServiceTest {
   void setAvailabilityThrowsWhenDriverDoesNotExist() {
     var id = UUID.randomUUID();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.empty());
 
     var request = new SetDriverAvailabilityRequest(true);
@@ -229,7 +229,7 @@ class DriverApplicationServiceTest {
 
     driver.markAvailable();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(driver));
 
     var result = service.markUnavailable(id);
@@ -249,7 +249,7 @@ class DriverApplicationServiceTest {
         id,
         "Alex Smith");
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(driver));
 
     var result = service.markUnavailable(id);
@@ -265,7 +265,7 @@ class DriverApplicationServiceTest {
   void markUnavailableThrowsWhenDriverDoesNotExist() {
     var id = UUID.randomUUID();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.empty());
 
     assertThrows(

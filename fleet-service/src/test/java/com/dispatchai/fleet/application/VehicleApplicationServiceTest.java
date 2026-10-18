@@ -23,8 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.dispatchai.fleet.domain.model.Vehicle;
 import com.dispatchai.fleet.domain.model.VehicleType;
-import com.dispatchai.fleet.domain.model.exceptions.VehicleNotFoundException;
-import com.dispatchai.fleet.infrastructure.persistence.VehicleJpaRepository;
+import com.dispatchai.fleet.domain.exception.VehicleNotFoundException;
+import com.dispatchai.fleet.infrastructure.persistence.repository.VehicleJpaRepository;
 import com.dispatchai.fleet.presentation.dto.CreateVehicleRequest;
 import com.dispatchai.fleet.presentation.dto.SetVehicleAvailabilityRequest;
 
@@ -169,7 +169,7 @@ class VehicleApplicationServiceTest {
         VehicleType.VAN,
         new BigDecimal("1200"));
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(vehicle));
 
     var request = new SetVehicleAvailabilityRequest(true);
@@ -194,7 +194,7 @@ class VehicleApplicationServiceTest {
 
     vehicle.markAvailable();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(vehicle));
 
     var request = new SetVehicleAvailabilityRequest(false);
@@ -211,7 +211,7 @@ class VehicleApplicationServiceTest {
   void setAvailabilityThrowsWhenVehicleDoesNotExist() {
     var id = UUID.randomUUID();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.empty());
 
     var request = new SetVehicleAvailabilityRequest(true);

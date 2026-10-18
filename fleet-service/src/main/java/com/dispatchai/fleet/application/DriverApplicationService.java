@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dispatchai.fleet.domain.model.Driver;
 import com.dispatchai.fleet.domain.model.DriverAvailability;
-import com.dispatchai.fleet.domain.model.exceptions.DriverNotFoundException;
-import com.dispatchai.fleet.infrastructure.persistence.DriverJpaRepository;
+import com.dispatchai.fleet.domain.exception.DriverNotFoundException;
+import com.dispatchai.fleet.infrastructure.persistence.repository.DriverJpaRepository;
 import com.dispatchai.fleet.presentation.dto.CreateDriverRequest;
 import com.dispatchai.fleet.presentation.dto.DriverResponse;
 import com.dispatchai.fleet.presentation.dto.SetDriverAvailabilityRequest;
@@ -44,8 +45,9 @@ public class DriverApplicationService {
     return toResponse(drivers);
   }
 
+  @Transactional
   public DriverResponse setAvailability(UUID id, SetDriverAvailabilityRequest request) {
-    var driver = repository.findById(id)
+    var driver = repository.findByIdForUpdate(id)
         .orElseThrow(() -> new DriverNotFoundException(id));
 
     if (request.available()) {
@@ -59,8 +61,9 @@ public class DriverApplicationService {
     return toResponse(driver);
   }
 
+  @Transactional
   public DriverResponse markUnavailable(UUID driverId) {
-    var driver = repository.findById(driverId)
+    var driver = repository.findByIdForUpdate(driverId)
         .orElseThrow(() -> new DriverNotFoundException(driverId));
 
     driver.markUnavailable();

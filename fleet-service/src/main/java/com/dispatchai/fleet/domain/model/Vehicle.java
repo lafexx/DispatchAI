@@ -30,6 +30,20 @@ public class Vehicle {
   @Column(nullable = false)
   private boolean available;
 
+  @Column(nullable = false)
+  private int activeAssignmentCount;
+
+  public void assignmentStarted() { activeAssignmentCount++; }
+
+  public void assignmentFinished() {
+    if (activeAssignmentCount <= 0) {
+      throw new IllegalStateException("Assignment occupancy is already zero");
+    }
+    activeAssignmentCount--;
+  }
+
+  public int getActiveAssignmentCount() { return activeAssignmentCount; }
+
   protected Vehicle() {
   }
 
@@ -88,6 +102,6 @@ public class Vehicle {
   }
 
   public boolean isAvailable() {
-    return available;
+    return available && activeAssignmentCount == 0;
   }
 }
