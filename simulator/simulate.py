@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """DispatchAI demo traffic. Python standard library only; no LLM calls."""
+
 import json
 import logging
 import math
@@ -16,8 +17,14 @@ from urllib.request import Request, urlopen
 
 LOG = logging.getLogger("simulator")
 TERMINAL = {"COMPLETED", "CANCELLED"}
-ADDRESSES = ["12 King St, Sydney", "45 George St, Sydney", "8 Pitt St, Sydney",
-             "90 Clarence St, Sydney", "22 York St, Sydney", "5 Harbour St, Sydney"]
+ADDRESSES = [
+    "12 King St, Sydney",
+    "45 George St, Sydney",
+    "8 Pitt St, Sydney",
+    "90 Clarence St, Sydney",
+    "22 York St, Sydney",
+    "5 Harbour St, Sydney",
+]
 
 
 def number(name, default, cast=float, minimum=0):
@@ -39,28 +46,28 @@ class Config:
     max_active: int = 6
     max_tracked: int = 24
     max_deliveries: int = 120
-    delay_probability: float = .25
-    cancel_probability: float = .15
-    recycle: bool = True
+    delay_probability: float = 0.25
+    cancel_probability: float = 0.15
+    recycle: bool = False
     state_file: str = "simulator-state.json"
     seed: int = 318
 
     @classmethod
     def from_env(cls):
         c = cls(
-            tick=number("SIM_TICK_SECONDS", 1, minimum=.1),
+            tick=number("SIM_TICK_SECONDS", 1, minimum=0.1),
             arrival=number("SIM_ARRIVAL_SECONDS", 10, minimum=1),
             transit=number("SIM_TRANSIT_SECONDS", 45, minimum=5),
-            speed=number("SIM_SPEED", 1, minimum=.1),
+            speed=number("SIM_SPEED", 1, minimum=0.1),
             drivers=number("SIM_DRIVERS", 12, int, 1),
             initial=number("SIM_INITIAL_DELIVERIES", 6, int),
             pending_target=number("SIM_PENDING_TARGET", 3, int),
             max_active=number("SIM_MAX_ACTIVE", 6, int, 1),
             max_tracked=number("SIM_MAX_TRACKED", 24, int, 1),
             max_deliveries=number("SIM_MAX_DELIVERIES", 120, int, 1),
-            delay_probability=number("SIM_DELAY_PROBABILITY", .25),
-            cancel_probability=number("SIM_CANCEL_PROBABILITY", .15),
-            recycle=os.getenv("SIM_RECYCLE_DRIVERS", "true").lower() == "true",
+            delay_probability=number("SIM_DELAY_PROBABILITY", 0.25),
+            cancel_probability=number("SIM_CANCEL_PROBABILITY", 0.15),
+            recycle=os.getenv("SIM_RECYCLE_DRIVERS", "false").lower() == "true",
             state_file=os.getenv("SIM_STATE_FILE", "simulator-state.json"),
             seed=number("SIM_SEED", 318, int),
         )
@@ -79,22 +86,36 @@ class ApiError(Exception):
 
 class Api:
     def __init__(self):
-        self.urls = {name: os.getenv(f"{name.upper()}_URL", f"http://localhost:{port}").rstrip("/")
-                     for name, port in [("delivery", 8081), ("fleet", 8082),
-                                        ("dispatch", 8083), ("customer", 8084)]}
-        self.timeout = number("SIM_HTTP_TIMEOUT_SECONDS", 3, minimum=.1)
+        self.urls = {
+            name: os.getenv(f"{name.upper()}_URL", f"http://localhost:{port}").rstrip(
+                "/"
+            )
+            for name, port in [
+                ("delivery", 8081),
+                ("fleet", 8082),
+                ("dispatch", 8083),
+                ("customer", 8084),
+            ]
+        }
+        self.timeout = number("SIM_HTTP_TIMEOUT_SECONDS", 3, minimum=0.1)
 
     def request(self, service, method, path, body=None):
         data = json.dumps(body).encode() if body is not None else None
-        request = Request(self.urls[service] + path, data=data, method=method,
-                          headers={"Accept": "application/json", "Content-Type": "application/json"})
+        request = Request(
+            self.urls[service] + path,
+            data=data,
+            method=method,
+            headers={"Accept": "application/json", "Content-Type": "application/json"},
+        )
         try:
             with urlopen(request, timeout=self.timeout) as response:
                 raw = response.read()
                 return json.loads(raw) if raw else None
         except HTTPError as exc:
             detail = exc.read().decode(errors="replace")[:400]
-            raise ApiError(exc.code, f"{method} {service}{path}: HTTP {exc.code} {detail}") from exc
+            raise ApiError(
+                exc.code, f"{method} {service}{path}: HTTP {exc.code} {detail}"
+            ) from exc
         except (URLError, OSError, ValueError) as exc:
             raise ApiError(None, f"{method} {service}{path}: {exc}") from exc
 
@@ -113,6 +134,7 @@ class Job:
     due: float
     status: str = "PENDING"
     driver_id: str | None = None
+    vehicle_id: str | None = None
     assignment_attempted: bool = False
     fleet_observed: bool = False
     delay_attempted: bool = False
@@ -128,6 +150,7 @@ class Simulator:
         self.session = uuid.uuid4().hex[:8]
         self.customer_id = None
         self.driver_ids = []
+        self.vehicle_ids = []
         self.jobs = {}
         self.created = 0
         self.next_arrival = 0
@@ -139,18 +162,28 @@ class Simulator:
             self.session = state["session"]
             self.customer_id = state["customer_id"]
             self.driver_ids = state["driver_ids"]
+            self.vehicle_ids = state.get("vehicle_ids", [])
             self.jobs = {j["delivery_id"]: Job(**j) for j in state["jobs"]}
             self.created = state["created"]
             self.next_arrival = state["next_arrival"]
             self.initial_remaining = state["initial_remaining"]
-            LOG.info("Resuming session=%s deliveries_created=%s", self.session, self.created)
+            LOG.info(
+                "Resuming session=%s deliveries_created=%s", self.session, self.created
+            )
 
     def save(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        state = dict(version=1, session=self.session, customer_id=self.customer_id,
-                     driver_ids=self.driver_ids, jobs=[asdict(j) for j in self.jobs.values()],
-                     created=self.created, next_arrival=self.next_arrival,
-                     initial_remaining=self.initial_remaining)
+        state = dict(
+            version=1,
+            session=self.session,
+            customer_id=self.customer_id,
+            driver_ids=self.driver_ids,
+            vehicle_ids=self.vehicle_ids,
+            jobs=[asdict(j) for j in self.jobs.values()],
+            created=self.created,
+            next_arrival=self.next_arrival,
+            initial_remaining=self.initial_remaining,
+        )
         temp = self.path.with_suffix(self.path.suffix + ".tmp")
         temp.write_text(json.dumps(state, indent=2))
         temp.replace(self.path)
@@ -160,8 +193,10 @@ class Simulator:
         self.api.get("customer", "/api/customers")
         self.api.get("fleet", "/api/drivers")
         probe = "00000000-0000-0000-0000-000000000000"
-        for service, path in [("delivery", f"/api/deliveries/{probe}"),
-                              ("dispatch", f"/api/dispatch/assignments/{probe}")]:
+        for service, path in [
+            ("delivery", f"/api/deliveries/{probe}"),
+            ("dispatch", f"/api/dispatch/assignments/{probe}"),
+        ]:
             try:
                 self.api.get(service, path)
             except ApiError as exc:
@@ -173,77 +208,147 @@ class Simulator:
                 self.api.get("customer", f"/api/customers/{self.customer_id}")
             except ApiError as exc:
                 if exc.status == 404:
-                    raise ValueError("Saved customer no longer exists. Stop the simulator and remove its state volume after resetting the backend.") from exc
+                    raise ValueError(
+                        "Saved customer no longer exists. Stop the simulator and remove its state volume after resetting the backend."
+                    ) from exc
                 raise
         else:
-            customer = self.api.post("customer", "/api/customers", {
-                "name": f"Demo customer {self.session}",
-                "email": f"demo-{self.session}@example.com", "phone": "0400000000"})
+            customer = self.api.post(
+                "customer",
+                "/api/customers",
+                {
+                    "name": f"Demo customer {self.session}",
+                    "email": f"demo-{self.session}@example.com",
+                    "phone": "0400000000",
+                },
+            )
             self.customer_id = customer["id"]
             self.save()
         # Save each creation separately so normal restarts reuse the owned pool.
         while len(self.driver_ids) < self.c.drivers:
-            driver = self.api.post("fleet", "/api/drivers", {
-                "name": f"Demo driver {len(self.driver_ids) + 1:02d} ({self.session})"})
+            driver = self.api.post(
+                "fleet",
+                "/api/drivers",
+                {
+                    "name": f"Demo driver {len(self.driver_ids) + 1:02d} ({self.session})"
+                },
+            )
             self.driver_ids.append(driver["id"])
             self.save()
-            self.api.post("fleet", f"/api/drivers/{driver['id']}/availability", {"available": True})
-        LOG.info("Ready session=%s customer=%s drivers=%s", self.session, self.customer_id, len(self.driver_ids))
+            self.api.post(
+                "fleet",
+                f"/api/drivers/{driver['id']}/availability",
+                {"available": True},
+            )
+        while len(self.vehicle_ids) < self.c.drivers:
+            index = len(self.vehicle_ids)
+            vehicle = self.api.post("fleet", "/api/vehicles", {
+                "registration": f"DEMO-{self.session}-{index+1:02d}",
+                "type": "VAN", "capacityKg": [100, 500, 1500][index % 3],
+            })
+            self.vehicle_ids.append(vehicle["id"])
+            self.save()
+            self.api.post("fleet", f"/api/vehicles/{vehicle['id']}/availability", {"available": True})
+        LOG.info(
+            "Ready session=%s customer=%s drivers=%s",
+            self.session,
+            self.customer_id,
+            len(self.driver_ids),
+        )
 
     def after(self, seconds):
         return self.clock() + seconds / self.c.speed
 
     def available(self):
         reserved = {j.driver_id for j in self.jobs.values() if j.driver_id}
-        return [d["id"] for d in self.api.get("fleet", "/api/drivers/available")
-                if d["id"] in self.driver_ids and d["id"] not in reserved]
+        return [
+            d["id"]
+            for d in self.api.get("fleet", "/api/drivers/available")
+            if d["id"] in self.driver_ids and d["id"] not in reserved
+        ]
 
     def arrive(self):
-        if self.created >= self.c.max_deliveries or len(self.jobs) >= self.c.max_tracked:
+        if (
+            self.created >= self.c.max_deliveries
+            or len(self.jobs) >= self.c.max_tracked
+        ):
             return
-        held = sum(not j.automated and j.status == "PENDING" for j in self.jobs.values())
+        held = sum(
+            not j.automated and j.status == "PENDING" for j in self.jobs.values()
+        )
         automated = held >= self.c.pending_target
-        active = sum(j.automated and j.status not in TERMINAL for j in self.jobs.values())
+        active = sum(
+            j.automated and j.status not in TERMINAL for j in self.jobs.values()
+        )
         if automated and (active >= self.c.max_active or not self.available()):
             return
         # Schedule before POST. Never blindly retry non-idempotent delivery creation.
-        self.next_arrival = self.after(self.c.arrival * self.rng.uniform(.7, 1.3))
+        self.next_arrival = self.after(self.c.arrival * self.rng.uniform(0.7, 1.3))
         self.save()
         pickup, destination = self.rng.sample(ADDRESSES, 2)
-        delivery = self.api.post("delivery", "/api/deliveries", {
-            "customerId": self.customer_id, "pickupAddress": pickup,
-            "destinationAddress": destination})
+        delivery = self.api.post(
+            "delivery",
+            "/api/deliveries",
+            {
+                "customerId": self.customer_id,
+                "pickupAddress": pickup,
+                "destinationAddress": destination,
+                "parcelWeightKg": self.rng.choice([0.5, 5, 50, 150, 600, 1200] if self.c.drivers >= 3 else [0.5, 5, 50]),
+            },
+        )
         draw = self.rng.random()
-        outcome = "cancel" if draw < self.c.cancel_probability else (
-            "delay" if draw < self.c.cancel_probability + self.c.delay_probability else "complete")
-        job = Job(delivery["id"], automated, outcome, self.after(self.rng.uniform(3, 7)))
+        outcome = (
+            "cancel"
+            if draw < self.c.cancel_probability
+            else (
+                "delay"
+                if draw < self.c.cancel_probability + self.c.delay_probability
+                else "complete"
+            )
+        )
+        job = Job(
+            delivery["id"], automated, outcome, self.after(self.rng.uniform(3, 7))
+        )
         self.jobs[job.delivery_id] = job
         self.created += 1
         self.initial_remaining = max(0, self.initial_remaining - 1)
         self.save()
-        LOG.info("Created delivery=%s mode=%s outcome=%s", job.delivery_id,
-                 "automatic" if automated else "human-controlled", outcome if automated else "human-controlled")
+        LOG.info(
+            "Created delivery=%s mode=%s outcome=%s",
+            job.delivery_id,
+            "automatic" if automated else "human-controlled",
+            outcome if automated else "human-controlled",
+        )
 
     def finish(self, job, delivery):
         driver_id = delivery.get("assignedDriverId")
         # Release only simulator-owned drivers, never drivers created by someone else.
         # All other tracked deliveries must also have finished before release.
         if self.c.recycle and driver_id in self.driver_ids:
-            assignments = self.api.get("dispatch", f"/api/dispatch/drivers/{driver_id}/assignments")
+            assignments = self.api.get(
+                "dispatch", f"/api/dispatch/drivers/{driver_id}/assignments"
+            )
             for assignment in assignments:
                 if assignment["deliveryId"] == job.delivery_id:
                     continue
-                current = self.api.get("delivery", f"/api/deliveries/{assignment['deliveryId']}")
+                current = self.api.get(
+                    "delivery", f"/api/deliveries/{assignment['deliveryId']}"
+                )
                 if current["status"] not in TERMINAL:
                     return
             driver = self.api.get("fleet", f"/api/drivers/{driver_id}")
             # A terminal event can precede Fleet's assignment consumer. Wait for it.
             if not job.fleet_observed and driver["availability"] != "UNAVAILABLE":
                 if not job.warned:
-                    LOG.warning("Waiting for Fleet assignment propagation before release: %s", job.delivery_id)
+                    LOG.warning(
+                        "Waiting for Fleet assignment propagation before release: %s",
+                        job.delivery_id,
+                    )
                     job.warned = True
                 return
-            self.api.post("fleet", f"/api/drivers/{driver_id}/availability", {"available": True})
+            self.api.post(
+                "fleet", f"/api/drivers/{driver_id}/availability", {"available": True}
+            )
             LOG.info("Recycled demo driver=%s", driver_id)
         del self.jobs[job.delivery_id]
         self.save()
@@ -268,19 +373,39 @@ class Simulator:
         if actual_driver and actual_driver != job.driver_id:
             job.automated = False
             job.driver_id = actual_driver
-            LOG.info("Human assigned delivery=%s; relinquishing lifecycle control", job.delivery_id)
+            LOG.info(
+                "Human assigned delivery=%s; relinquishing lifecycle control",
+                job.delivery_id,
+            )
             return
         if status == "PENDING":
             if job.assignment_attempted:
                 try:
-                    self.api.get("dispatch", f"/api/dispatch/deliveries/{job.delivery_id}/assignment")
+                    assignment = self.api.get(
+                        "dispatch",
+                        f"/api/dispatch/deliveries/{job.delivery_id}/assignment",
+                    )
+                    if assignment["status"] == "REJECTED":
+                        job.assignment_attempted = False
+                        job.driver_id = None
+                        job.vehicle_id = None
+                        job.due = self.after(5)
+                        job.warned = False
+                        LOG.info(
+                            "Rejected assignment observed; scheduling a new attempt delivery=%s",
+                            job.delivery_id,
+                        )
+                        return
                 except ApiError as exc:
                     if exc.status != 404:
                         raise
                 # Even a timed-out POST may have persisted. Reserve the driver and
                 # observe rather than retry or advance a delivery that is still pending.
                 if now > job.due + 30 and not job.warned:
-                    LOG.warning("Assignment stalled/uncertain delivery=%s; inspect services. No retry will be sent.", job.delivery_id)
+                    LOG.warning(
+                        "Assignment stalled/uncertain delivery=%s; inspect services. No retry will be sent.",
+                        job.delivery_id,
+                    )
                     job.warned = True
                 return
             if now < job.due:
@@ -288,18 +413,40 @@ class Simulator:
             candidates = self.available()
             if not candidates:
                 return
+            eligibility = self.api.get("dispatch", f"/api/dispatch/deliveries/{job.delivery_id}/eligibility")
+            held_vehicles = {j.vehicle_id for j in self.jobs.values() if j.vehicle_id}
+            vehicles = [v for v in eligibility["eligibleVehicles"] if v["id"] in self.vehicle_ids and v["id"] not in held_vehicles]
+            if not vehicles:
+                return
+            eligible_drivers = {d["id"] for d in eligibility["availableDrivers"]}
+            candidates = [d for d in candidates if d in eligible_drivers]
+            if not candidates:
+                return
             job.driver_id = self.rng.choice(candidates)
+            job.vehicle_id = min(vehicles, key=lambda v: (v["capacityKg"], v["id"]))["id"]
             job.assignment_attempted = True
             job.due = now
             self.save()  # Journal intent before a potentially ambiguous POST result.
             try:
-                self.api.post("dispatch", "/api/dispatch/assignments", {
-                    "deliveryId": job.delivery_id, "driverId": job.driver_id, "vehicleId": None})
-                LOG.info("Requested assignment delivery=%s driver=%s", job.delivery_id, job.driver_id)
+                self.api.post(
+                    "dispatch",
+                    "/api/dispatch/assignments",
+                    {
+                        "deliveryId": job.delivery_id,
+                        "driverId": job.driver_id,
+                        "vehicleId": job.vehicle_id,
+                    },
+                )
+                LOG.info(
+                    "Requested assignment delivery=%s driver=%s",
+                    job.delivery_id,
+                    job.driver_id,
+                )
             except ApiError as exc:
                 if exc.status in {400, 404, 409, 422}:
                     job.assignment_attempted = False
                     job.driver_id = None
+                    job.vehicle_id = None
                     job.due = self.after(5)
                 raise
             return
@@ -310,15 +457,23 @@ class Simulator:
                 job.due = self.after(self.rng.uniform(3, 7))
             if now >= job.due:
                 if job.outcome == "cancel":
-                    self.api.post("delivery", f"/api/deliveries/{job.delivery_id}/cancel", {
-                        "reason": "CUSTOMER_REQUEST", "notes": "Demo scenario: customer changed plans"})
+                    self.api.post(
+                        "delivery",
+                        f"/api/deliveries/{job.delivery_id}/cancel",
+                        {
+                            "reason": "CUSTOMER_REQUEST",
+                            "notes": "Demo scenario: customer changed plans",
+                        },
+                    )
                 else:
-                    self.api.post("delivery", f"/api/deliveries/{job.delivery_id}/start")
+                    self.api.post(
+                        "delivery", f"/api/deliveries/{job.delivery_id}/start"
+                    )
                 job.due = self.after(3)
             return
         if status == "IN_TRANSIT":
             if not job.complete_due:
-                duration = self.c.transit * self.rng.uniform(.7, 1.3)
+                duration = self.c.transit * self.rng.uniform(0.7, 1.3)
                 job.complete_due = self.after(duration)
                 job.due = self.after(duration / 2)
             if job.outcome == "delay" and not job.delay_attempted and now >= job.due:
@@ -326,8 +481,11 @@ class Simulator:
                 minutes = self.rng.choice([5, 10, 15, 25])
                 job.complete_due += 15 / self.c.speed
                 self.save()
-                self.api.post("delivery", f"/api/deliveries/{job.delivery_id}/delay", {
-                    "delayMinutes": minutes, "reason": "Demo scenario: heavy traffic"})
+                self.api.post(
+                    "delivery",
+                    f"/api/deliveries/{job.delivery_id}/delay",
+                    {"delayMinutes": minutes, "reason": "Demo scenario: heavy traffic"},
+                )
                 LOG.info("Delayed delivery=%s minutes=%s", job.delivery_id, minutes)
             elif now >= job.complete_due:
                 self.api.post("delivery", f"/api/deliveries/{job.delivery_id}/complete")
@@ -351,14 +509,18 @@ class Simulator:
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
+    )
     stop = threading.Event()
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: stop.set())
     try:
         simulator = Simulator(Config.from_env(), Api())
         # Bootstrap POSTs are not automatically retried: a timeout can hide success.
-        deadline = time.monotonic() + number("SIM_STARTUP_TIMEOUT_SECONDS", 180, minimum=1)
+        deadline = time.monotonic() + number(
+            "SIM_STARTUP_TIMEOUT_SECONDS", 180, minimum=1
+        )
         while not stop.is_set():
             try:
                 simulator.bootstrap()

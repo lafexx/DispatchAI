@@ -1,14 +1,17 @@
 """Contract-shaped mock APIs: no Spring build or running DispatchAI stack required."""
+
 import importlib.util
 import json
+import sys
 import tempfile
 import threading
 import unittest
-import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-SPEC = importlib.util.spec_from_file_location("simulate", Path(__file__).parents[1] / "simulate.py")
+SPEC = importlib.util.spec_from_file_location(
+    "simulate", Path(__file__).parents[1] / "simulate.py"
+)
 mod = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = mod
 SPEC.loader.exec_module(mod)
@@ -17,6 +20,7 @@ SPEC.loader.exec_module(mod)
 class MockApi:
     def __init__(self):
         self.customers, self.drivers, self.deliveries, self.assignments = {}, {}, {}, {}
+        self.vehicles = {}
         self.calls = []
         self.uncertain_assignment = False
         self.delay_propagation = False
@@ -24,10 +28,19 @@ class MockApi:
     def get(self, service, path):
         if path == "/api/customers":
             return list(self.customers.values())
+        if path == "/api/vehicles":
+            return list(self.vehicles.values())
+        if path.endswith("/eligibility"):
+            delivery = self.deliveries[path.split("/")[-2]]
+            return {"deliveryId": delivery["id"], "parcelWeightKg": delivery.get("parcelWeightKg", 1),
+                "availableDrivers": self.get("fleet", "/api/drivers/available"),
+                "eligibleVehicles": [v for v in self.vehicles.values() if v["available"] and v["capacityKg"] >= delivery.get("parcelWeightKg",1)]}
         if path == "/api/drivers":
             return list(self.drivers.values())
         if path == "/api/drivers/available":
-            return [d for d in self.drivers.values() if d["availability"] == "AVAILABLE"]
+            return [
+                d for d in self.drivers.values() if d["availability"] == "AVAILABLE"
+            ]
         if service == "dispatch" and path.endswith("/assignments"):
             driver = path.split("/")[-2]
             return [a for a in self.assignments.values() if a["driverId"] == driver]
@@ -36,8 +49,12 @@ class MockApi:
             if delivery in self.assignments:
                 return self.assignments[delivery]
             raise mod.ApiError(404, "GET assignment: not found")
-        collection = {"customer": self.customers, "fleet": self.drivers,
-                      "delivery": self.deliveries, "dispatch": {}}[service]
+        collection = {
+            "customer": self.customers,
+            "fleet": self.drivers,
+            "delivery": self.deliveries,
+            "dispatch": {},
+        }[service]
         if path.split("/")[-1] not in collection:
             raise mod.ApiError(404, "GET entity: not found")
         return collection[path.split("/")[-1]].copy()
@@ -49,18 +66,40 @@ class MockApi:
             self.customers[value["id"]] = value
             return value
         if path == "/api/drivers":
-            value = dict(body, id=f"driver-{len(self.drivers)}", availability="UNAVAILABLE")
+            value = dict(
+                body, id=f"driver-{len(self.drivers)}", availability="UNAVAILABLE"
+            )
             self.drivers[value["id"]] = value
             return value
+        if path == "/api/vehicles":
+            value = dict(body, id=f"vehicle-{len(self.vehicles)}", available=False)
+            self.vehicles[value["id"]] = value
+            return value
+        if path.startswith("/api/vehicles/") and path.endswith("/availability"):
+            vehicle = self.vehicles[path.split("/")[-2]]
+            vehicle["available"] = body["available"]
+            return vehicle
         if path.endswith("/availability"):
             driver = self.drivers[path.split("/")[-2]]
             driver["availability"] = "AVAILABLE" if body["available"] else "UNAVAILABLE"
             return driver
         if path == "/api/deliveries":
-            value = dict(body, id=f"delivery-{len(self.deliveries)}", status="PENDING", assignedDriverId=None)
+            value = dict(
+                body,
+                id=f"delivery-{len(self.deliveries)}",
+                status="PENDING",
+                assignedDriverId=None,
+            )
             self.deliveries[value["id"]] = value
             return value
         if path == "/api/dispatch/assignments":
+            if not body.get("vehicleId"):
+                fit = [v for v in self.vehicles.values() if v["available"] and v["capacityKg"] >= self.deliveries[body["deliveryId"]].get("parcelWeightKg",1)]
+                body = dict(body, vehicleId=min(fit,key=lambda v:v["capacityKg"])["id"])
+            vehicle = self.vehicles[body["vehicleId"]]
+            assert vehicle["available"]
+            assert vehicle["capacityKg"] >= self.deliveries[body["deliveryId"]].get("parcelWeightKg",1)
+            vehicle["available"] = False
             self.assignments[body["deliveryId"]] = dict(body, status="ACTIVE")
             if not self.delay_propagation:
                 self.propagate(body["deliveryId"])
@@ -83,11 +122,17 @@ class MockApi:
             delivery["delayed"] = True
         else:
             raise AssertionError(path)
+        if action in {"complete", "cancel"}:
+            assignment = self.assignments.get(delivery["id"])
+            if assignment and assignment.get("vehicleId"):
+                self.vehicles[assignment["vehicleId"]]["available"] = True
         return delivery.copy()
 
     def propagate(self, delivery_id, fleet=True):
         assignment = self.assignments[delivery_id]
-        self.deliveries[delivery_id].update(status="ASSIGNED", assignedDriverId=assignment["driverId"])
+        self.deliveries[delivery_id].update(
+            status="ASSIGNED", assignedDriverId=assignment["driverId"]
+        )
         if fleet:
             self.drivers[assignment["driverId"]]["availability"] = "UNAVAILABLE"
 
@@ -98,8 +143,13 @@ class SimulatorTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.now = 1000
         self.api = MockApi()
-        self.config = mod.Config(state_file=str(Path(self.tmp.name) / "state.json"),
-                                 pending_target=0, drivers=3, initial=0)
+        self.config = mod.Config(
+            state_file=str(Path(self.tmp.name) / "state.json"),
+            pending_target=0,
+            drivers=3,
+            initial=0,
+            recycle=True,
+        )
         self.sim = mod.Simulator(self.config, self.api, lambda: self.now)
         self.sim.bootstrap()
 
@@ -109,6 +159,34 @@ class SimulatorTests(unittest.TestCase):
         job.outcome = outcome
         job.due = self.now
         return job
+
+    def test_owned_vehicle_pool_is_preserved_on_resume(self):
+        resumed = mod.Simulator(self.config, self.api, lambda: self.now)
+        resumed.bootstrap()
+        self.assertEqual(self.sim.vehicle_ids, resumed.vehicle_ids)
+        self.assertEqual(len(self.api.vehicles), self.config.drivers)
+
+    def test_assignment_carries_a_fitting_owned_vehicle(self):
+        job = self.job()
+        self.api.deliveries[job.delivery_id]["parcelWeightKg"] = 600
+        self.sim.advance(job)
+        self.assertIn(job.vehicle_id, self.sim.vehicle_ids)
+        self.assertGreaterEqual(self.api.vehicles[job.vehicle_id]["capacityKg"], 600)
+
+    def test_foreign_vehicle_cannot_be_selected(self):
+        job = self.job()
+        for vehicle in self.api.vehicles.values():
+            vehicle["available"] = False
+        foreign = self.api.post("fleet", "/api/vehicles", {"registration":"HUMAN", "type":"VAN", "capacityKg":9999})
+        self.api.post("fleet", f"/api/vehicles/{foreign['id']}/availability", {"available":True})
+        self.sim.advance(job)
+        self.assertFalse(job.assignment_attempted)
+
+    def test_overweight_delivery_waits_without_creating_assignment(self):
+        job = self.job()
+        self.api.deliveries[job.delivery_id]["parcelWeightKg"] = 9999
+        self.sim.advance(job)
+        self.assertFalse(job.assignment_attempted)
 
     def test_complete_lifecycle_recycles_owned_driver(self):
         job = self.job()
@@ -161,8 +239,11 @@ class SimulatorTests(unittest.TestCase):
         self.sim.advance(job)
         self.assertFalse(job.automated)
         self.assertEqual(self.api.deliveries[job.delivery_id]["status"], "PENDING")
-        self.api.post("dispatch", "/api/dispatch/assignments", {
-            "deliveryId": job.delivery_id, "driverId": self.sim.driver_ids[0]})
+        self.api.post(
+            "dispatch",
+            "/api/dispatch/assignments",
+            {"deliveryId": job.delivery_id, "driverId": self.sim.driver_ids[0]},
+        )
         self.sim.advance(job)
         self.assertEqual(self.api.deliveries[job.delivery_id]["status"], "ASSIGNED")
 
@@ -200,7 +281,9 @@ class SimulatorTests(unittest.TestCase):
 
     def test_other_drivers_are_not_selected(self):
         foreign = self.api.post("fleet", "/api/drivers", {"name": "Human driver"})
-        self.api.post("fleet", f"/api/drivers/{foreign['id']}/availability", {"available": True})
+        self.api.post(
+            "fleet", f"/api/drivers/{foreign['id']}/availability", {"available": True}
+        )
         self.assertNotIn(foreign["id"], self.sim.available())
 
     def test_release_checks_untracked_assignments(self):
@@ -208,9 +291,14 @@ class SimulatorTests(unittest.TestCase):
         self.sim.advance(job)
         self.sim.advance(job)
         self.api.deliveries[job.delivery_id]["status"] = "COMPLETED"
-        external = self.api.post("delivery", "/api/deliveries", {"customerId": self.sim.customer_id})
-        self.api.post("dispatch", "/api/dispatch/assignments", {
-            "deliveryId": external["id"], "driverId": job.driver_id})
+        external = self.api.post(
+            "delivery", "/api/deliveries", {"customerId": self.sim.customer_id}
+        )
+        self.api.post(
+            "dispatch",
+            "/api/dispatch/assignments",
+            {"deliveryId": external["id"], "driverId": job.driver_id},
+        )
         self.sim.advance(job)
         self.assertIn(job.delivery_id, self.sim.jobs)
         self.assertEqual(self.api.drivers[job.driver_id]["availability"], "UNAVAILABLE")
@@ -235,16 +323,34 @@ class SimulatorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Saved customer"):
             self.sim.bootstrap()
 
+    def test_rejected_assignment_allows_a_new_attempt(self):
+        job = self.job()
+        self.api.delay_propagation = True
+        self.sim.advance(job)
+        self.api.assignments[job.delivery_id]["status"] = "REJECTED"
+        self.sim.advance(job)
+        self.assertFalse(job.assignment_attempted)
+        self.assertIsNone(job.driver_id)
+        self.now += 10
+        self.sim.advance(job)
+        calls = [c for c in self.api.calls if c[1] == "/api/dispatch/assignments"]
+        self.assertEqual(len(calls), 2)
+
     def test_continuous_activity_keeps_pending_queue_and_reuses_pool(self):
         self.config.pending_target = 2
         self.config.max_deliveries = 18
         for _ in range(500):
             self.sim.tick()
             self.now += 2
-            active = sum(j.automated and j.status not in mod.TERMINAL for j in self.sim.jobs.values())
+            active = sum(
+                j.automated and j.status not in mod.TERMINAL
+                for j in self.sim.jobs.values()
+            )
             self.assertLessEqual(active, self.config.max_active)
         pending = [d for d in self.api.deliveries.values() if d["status"] == "PENDING"]
-        terminal = [d for d in self.api.deliveries.values() if d["status"] in mod.TERMINAL]
+        terminal = [
+            d for d in self.api.deliveries.values() if d["status"] in mod.TERMINAL
+        ]
         self.assertEqual(self.sim.created, 18)
         self.assertEqual(len(pending), 2)
         self.assertEqual(len(terminal), 16)
@@ -254,18 +360,24 @@ class SimulatorTests(unittest.TestCase):
 class HttpTests(unittest.TestCase):
     def test_json_transport_and_http_error_status(self):
         seen = []
+
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *_):
                 pass
+
             def do_POST(self):
-                seen.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                seen.append(
+                    json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                )
                 self.send_response(201)
                 self.end_headers()
                 self.wfile.write(b'{"id":"created"}')
+
             def do_GET(self):
                 self.send_response(404)
                 self.end_headers()
                 self.wfile.write(b'{"message":"not found"}')
+
         server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
