@@ -11,5 +11,6 @@ public record DeliveryStateUpdate(
     Boolean delayed,
     Integer delayMinutes,
     String delayReason,
-    Instant eventTime) {
+    Instant eventTime,
+    UUID eventId) {
 }

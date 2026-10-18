@@ -15,7 +15,8 @@ public record DeliveryAnalyticsState(
     Instant startedAt,
     Instant completedAt,
     Instant cancelledAt,
-    Instant assignedAt) {
+    Instant assignedAt,
+    Instant lastDelayAt) {
 
   public static DeliveryAnalyticsState empty() {
     return new DeliveryAnalyticsState(
@@ -24,6 +25,7 @@ public record DeliveryAnalyticsState(
         null,
         null,
         false,
+        null,
         null,
         null,
         null,
@@ -50,15 +52,15 @@ public record DeliveryAnalyticsState(
         ? update.driverId()
         : driverId;
 
-    var nextDelayed = update.delayed() != null
-        ? update.delayed()
-        : delayed;
+    var nextDelayed = delayed || Boolean.TRUE.equals(update.delayed());
+    boolean newerDelay = Boolean.TRUE.equals(update.delayed()) && update.eventTime() != null
+        && (lastDelayAt == null || update.eventTime().isAfter(lastDelayAt));
 
-    var nextDelayMinutes = update.delayMinutes() != null
+    var nextDelayMinutes = newerDelay && update.delayMinutes() != null
         ? update.delayMinutes()
         : delayMinutes;
 
-    var nextDelayReason = update.delayReason() != null
+    var nextDelayReason = newerDelay && update.delayReason() != null
         ? update.delayReason()
         : delayReason;
 
@@ -105,7 +107,8 @@ public record DeliveryAnalyticsState(
         nextStartedAt,
         nextCompletedAt,
         nextCancelledAt,
-        nextAssignedAt);
+        nextAssignedAt,
+        newerDelay ? update.eventTime() : lastDelayAt);
   }
 
   private static AnalyticsDeliveryStatus resolveStatus(
