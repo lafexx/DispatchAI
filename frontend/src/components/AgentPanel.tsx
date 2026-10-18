@@ -1,126 +1,175 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOperationsAgent } from "@/features/agents/hooks";
-
-const presets = [
-  "Give me a summary of the current delivery operation.",
-  "Are there any operational issues that need attention right now?",
-  "What are the current completion, cancellation, and delay rates?",
+import { Icon, type IconName } from "./Icon";
+import { Panel, Notice } from "./UI";
+const prompts: { title: string; message: string; icon: IconName }[] = [
+  {
+    title: "Operational briefing",
+    message: "Give me a summary of the current delivery operation.",
+    icon: "overview",
+  },
+  {
+    title: "Find the bottlenecks",
+    message: "Are there any operational issues that need attention right now?",
+    icon: "alert",
+  },
+  {
+    title: "Understand performance",
+    message: "What are the current completion, cancellation, and delay rates?",
+    icon: "chart",
+  },
 ];
-
+interface Entry {
+  id: string;
+  question: string;
+  answer?: string;
+  error?: string;
+}
+function storedConversation(): Entry[] {
+  try {
+    const value = JSON.parse(
+      sessionStorage.getItem("dispatchai-conversation") ?? "[]",
+    );
+    return Array.isArray(value)
+      ? value
+          .filter(
+            (v: Entry) =>
+              v &&
+              typeof v.id === "string" &&
+              typeof v.question === "string" &&
+              (v.answer === undefined || typeof v.answer === "string") &&
+              (v.error === undefined || typeof v.error === "string"),
+          )
+          .slice(-20)
+      : [];
+  } catch {
+    return [];
+  }
+}
 export function AgentPanel() {
   const [message, setMessage] = useState("");
-
+  const [entries, setEntries] = useState<Entry[]>(storedConversation);
   const agent = useOperationsAgent();
-
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        "dispatchai-conversation",
+        JSON.stringify(entries.filter((e) => e.answer || e.error).slice(-20)),
+      );
+    } catch {
+      /* A blocked storage setting should not prevent a query. */
+    }
+  }, [entries]);
   function submit(value: string) {
     const trimmed = value.trim();
-
-    if (!trimmed) {
-      return;
-    }
-
-    agent.mutate(trimmed);
+    if (!trimmed || trimmed.length > 4000 || agent.isPending) return;
+    const id = crypto.randomUUID();
+    setEntries((prev) => [...prev.slice(-19), { id, question: trimmed }]);
+    setMessage("");
+    agent.mutate(trimmed, {
+      onSuccess: (data) =>
+        setEntries((prev) =>
+          prev.map((e) => (e.id === id ? { ...e, answer: data.response } : e)),
+        ),
+      onError: (error) =>
+        setEntries((prev) =>
+          prev.map((e) => (e.id === id ? { ...e, error: error.message } : e)),
+        ),
+    });
   }
-
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900">
-      <div className="border-b border-zinc-800 px-5 py-4">
-        <h2 className="font-semibold text-zinc-100">
-          Operations assistant
-        </h2>
-
-        <p className="mt-1 text-sm text-zinc-500">
-          Queries live operational data through the agent
-          service.
+    <Panel>
+      <div className="assistant-welcome">
+        <div className="flex justify-between">
+          <div className="assistant-symbol">
+            <Icon name="spark" size={25} />
+          </div>
+          {entries.length > 0 && (
+            <button
+              className="button button-small button-ghost self-start"
+              disabled={agent.isPending}
+              onClick={() => setEntries([])}
+            >
+              Clear conversation
+            </button>
+          )}
+        </div>
+        <h2>Your operations, in plain language.</h2>
+        <p>
+          Ask about delivery performance, resource availability, or the work
+          that needs attention. The assistant looks up operational data to
+          answer your question.
         </p>
       </div>
-
-      <div className="space-y-4 p-5">
-        <div className="flex flex-wrap gap-2">
-          {presets.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              disabled={agent.isPending}
-              onClick={() => {
-                setMessage(preset);
-                submit(preset);
-              }}
-              className="
-                rounded-lg border border-zinc-700
-                bg-zinc-800 px-3 py-2
-                text-xs text-zinc-300
-                transition hover:bg-zinc-700
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
-            >
-              {preset}
-            </button>
-          ))}
-        </div>
-
-        <form
-          className="flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            submit(message);
-          }}
-        >
-          <input
-            value={message}
-            onChange={(event) =>
-              setMessage(event.target.value)
-            }
-            placeholder="Ask about current operations..."
-            className="
-              min-w-0 flex-1 rounded-lg
-              border border-zinc-700
-              bg-zinc-950 px-4 py-2.5
-              text-sm text-zinc-100
-              outline-none
-              placeholder:text-zinc-600
-              focus:border-zinc-500
-            "
-          />
-
+      <div className="prompt-grid">
+        {prompts.map((p) => (
           <button
-            type="submit"
-            disabled={
-              agent.isPending ||
-              message.trim().length === 0
-            }
-            className="
-              rounded-lg bg-zinc-100
-              px-4 py-2.5
-              text-sm font-medium text-zinc-950
-              transition hover:bg-white
-              disabled:cursor-not-allowed
-              disabled:opacity-50
-            "
+            key={p.title}
+            className="prompt-card"
+            disabled={agent.isPending}
+            onClick={() => submit(p.message)}
           >
-            {agent.isPending ? "Thinking..." : "Ask"}
+            <Icon name={p.icon} />
+            <strong>{p.title}</strong>
+            <span className="cell-secondary">{p.message}</span>
           </button>
-        </form>
-
-        {agent.isError && (
-          <div className="rounded-lg border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
-            Failed to query the operations agent.
-          </div>
-        )}
-
-        {agent.data && (
-          <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-              Response
-            </p>
-
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-300">
-              {agent.data.response}
-            </p>
-          </div>
-        )}
+        ))}
       </div>
-    </div>
+      <div
+        className="conversation"
+        aria-live="polite"
+        aria-busy={agent.isPending}
+      >
+        {entries.map((e) => (
+          <div key={e.id} className="flex flex-col gap-3">
+            <div className="chat-question">{e.question}</div>
+            {e.error ? (
+              <Notice tone="error">{e.error}</Notice>
+            ) : e.answer ? (
+              <div className="chat-answer">
+                <div className="flex items-center gap-2 text-purple mb-3">
+                  <Icon name="spark" size={14} />
+                  <strong className="text-xs">DispatchAI assistant</strong>
+                </div>
+                {e.answer}
+              </div>
+            ) : (
+              <div className="chat-answer muted flex items-center gap-3">
+                <span className="spinner" />
+                Checking operational data…
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <form
+        className="assistant-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit(message);
+        }}
+      >
+        <textarea
+          aria-label="Ask the operations assistant"
+          placeholder="What would you like to know about your operation?"
+          maxLength={4000}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          disabled={agent.isPending}
+        />
+        <button
+          type="submit"
+          className="button button-primary self-end"
+          disabled={agent.isPending || !message.trim()}
+        >
+          <Icon name="send" size={15} />
+          {agent.isPending ? "Thinking…" : "Send"}
+        </button>
+      </form>
+      <p className="chart-footnote">
+        Answers reflect the data returned when you ask. Review important
+        decisions before acting.
+      </p>
+    </Panel>
   );
 }

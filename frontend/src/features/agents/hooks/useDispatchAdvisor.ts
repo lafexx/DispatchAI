@@ -3,7 +3,6 @@ import { queryDispatchAdvisor } from "@/api";
 
 export function useDispatchAdvisor() {
   return useMutation({
-    mutationFn: (deliveryId: string) =>
-      queryDispatchAdvisor(deliveryId),
+    mutationFn: (deliveryId: string) => queryDispatchAdvisor(deliveryId),
   });
 }

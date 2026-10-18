@@ -3,7 +3,6 @@ import { queryOperationsAgent } from "@/api";
 
 export function useOperationsAgent() {
   return useMutation({
-    mutationFn: (message: string) =>
-      queryOperationsAgent(message),
+    mutationFn: (message: string) => queryOperationsAgent(message),
   });
 }
