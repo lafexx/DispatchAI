@@ -1,4 +1,4 @@
-import { postJson } from "../http";
+import { postJson, requestJson } from "../http";
 import type {
   AgentRequest,
   AgentResponse,
@@ -8,43 +8,24 @@ import type {
 
 const BASE_URL = "/agent-api/api/agent";
 
-async function postAgentRequest(
+function postAgentRequest(
   url: string,
   input: AgentRequest,
 ): Promise<AgentResponse> {
-  const response = await fetch(url, {
+  return requestJson<AgentResponse>(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(input),
   });
-
-  if (!response.ok) {
-    throw new Error(
-      `Agent request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  return response.json() as Promise<AgentResponse>;
 }
 
-export function queryOperationsAgent(
-  message: string,
-): Promise<AgentResponse> {
-  return postAgentRequest(
-    `${BASE_URL}/operations/query`,
-    { message },
-  );
+export function queryOperationsAgent(message: string): Promise<AgentResponse> {
+  return postAgentRequest(`${BASE_URL}/operations/query`, { message });
 }
 
 export function queryDispatchAdvisor(
   deliveryId: string,
 ): Promise<DispatchAdviceResponse> {
-  return postJson<
-    DispatchAdviceResponse,
-    DispatchAdviceRequest
-  >(
+  return postJson<DispatchAdviceResponse, DispatchAdviceRequest>(
     "/agent-api/api/agent/dispatch/advice",
     { deliveryId },
   );

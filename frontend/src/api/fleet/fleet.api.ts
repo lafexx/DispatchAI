@@ -1,68 +1,40 @@
+import { requestJson } from "../http";
 import type {
   CreateDriverRequest,
   DriverResponse,
   SetDriverAvailabilityRequest,
+  VehicleResponse,
+  CreateVehicleRequest,
 } from "./fleet.contracts";
-
-const BASE_URL = "/fleet-api/api/drivers";
-
-async function request<T>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Fleet request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  return response.json() as Promise<T>;
-}
-
-export function getDrivers(): Promise<DriverResponse[]> {
-  return request<DriverResponse[]>(BASE_URL);
-}
-
-export function getDriver(
-  driverId: string,
-): Promise<DriverResponse> {
-  return request<DriverResponse>(
-    `${BASE_URL}/${driverId}`,
-  );
-}
-
-export function getAvailableDrivers(): Promise<DriverResponse[]> {
-  return request<DriverResponse[]>(
-    `${BASE_URL}/available`,
-  );
-}
-
-export function createDriver(
-  input: CreateDriverRequest,
-): Promise<DriverResponse> {
-  return request<DriverResponse>(BASE_URL, {
+const BASE = "/fleet-api/api";
+export const getDrivers = () =>
+  requestJson<DriverResponse[]>(`${BASE}/drivers`);
+export const getDriver = (id: string) =>
+  requestJson<DriverResponse>(`${BASE}/drivers/${id}`);
+export const getAvailableDrivers = () =>
+  requestJson<DriverResponse[]>(`${BASE}/drivers/available`);
+export const createDriver = (input: CreateDriverRequest) =>
+  requestJson<DriverResponse>(`${BASE}/drivers`, {
     method: "POST",
     body: JSON.stringify(input),
   });
-}
-
-export function setDriverAvailability(
-  driverId: string,
+export const setDriverAvailability = (
+  id: string,
   input: SetDriverAvailabilityRequest,
-): Promise<DriverResponse> {
-  return request<DriverResponse>(
-    `${BASE_URL}/${driverId}/availability`,
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    },
-  );
-}
+) =>
+  requestJson<DriverResponse>(`${BASE}/drivers/${id}/availability`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+export const getVehicles = () =>
+  requestJson<VehicleResponse[]>(`${BASE}/vehicles`);
+export const createVehicle = (input: CreateVehicleRequest) =>
+  requestJson<VehicleResponse>(`${BASE}/vehicles`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+export const setVehicleAvailability = (id: string, available: boolean) =>
+  requestJson<VehicleResponse>(`${BASE}/vehicles/${id}/availability`, {
+    method: "POST",
+    body: JSON.stringify({ available }),
+  });

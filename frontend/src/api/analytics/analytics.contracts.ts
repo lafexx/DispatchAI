@@ -21,6 +21,7 @@ export interface DeliveryAnalyticsState {
   startedAt: string | null;
   completedAt: string | null;
   cancelledAt: string | null;
+  lastDelayAt?: string | null;
 }
 
 export interface DeliverySummaryResponse {
@@ -51,4 +52,14 @@ export interface DriverAnalyticsResponse {
 
   averageDeliveryTimeSeconds: number;
   averageTransitTimeSeconds: number;
+}
+
+export interface TimeBucketResponse {
+  start: string;
+  end: string;
+  created: number;
+  completed: number;
+  activeDeliveries: number;
+  delayedDeliveries: number;
+  delayRate: number | null;
 }

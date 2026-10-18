@@ -1,3 +1,4 @@
+import { requestJson } from "../http";
 import type {
   AssignmentResponse,
   AutoAssignRequest,
@@ -6,57 +7,30 @@ import type {
 
 const BASE_URL = "/dispatch-api/api/dispatch";
 
-async function request<T>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Dispatch request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  return response.json() as Promise<T>;
-}
+const request = requestJson;
 
 export function createAssignment(
   input: CreateAssignmentRequest,
 ): Promise<AssignmentResponse> {
-  return request<AssignmentResponse>(
-    `${BASE_URL}/assignments`,
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    },
-  );
+  return request<AssignmentResponse>(`${BASE_URL}/assignments`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
 }
 
 export function autoAssign(
   input: AutoAssignRequest,
 ): Promise<AssignmentResponse> {
-  return request<AssignmentResponse>(
-    `${BASE_URL}/assignments/auto`,
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    },
-  );
+  return request<AssignmentResponse>(`${BASE_URL}/assignments/auto`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
 }
 
 export function getAssignment(
   assignmentId: string,
 ): Promise<AssignmentResponse> {
-  return request<AssignmentResponse>(
-    `${BASE_URL}/assignments/${assignmentId}`,
-  );
+  return request<AssignmentResponse>(`${BASE_URL}/assignments/${assignmentId}`);
 }
 
 export function getDeliveryAssignment(
@@ -72,5 +46,11 @@ export function getDriverAssignments(
 ): Promise<AssignmentResponse[]> {
   return request<AssignmentResponse[]>(
     `${BASE_URL}/drivers/${driverId}/assignments`,
+  );
+}
+
+export function getDispatchEligibility(deliveryId: string) {
+  return request<import("./dispatch.contracts").DispatchEligibilityResponse>(
+    `${BASE_URL}/deliveries/${deliveryId}/eligibility`,
   );
 }

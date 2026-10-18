@@ -1,3 +1,4 @@
+import { requestJson } from "../http";
 import type {
   CancelDeliveryRequest,
   CreateDeliveryRequest,
@@ -7,33 +8,10 @@ import type {
 
 const BASE_URL = "/delivery-api/api/deliveries";
 
-async function request<T>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
+const request = requestJson;
 
-  if (!response.ok) {
-    throw new Error(
-      `Delivery request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  return response.json() as Promise<T>;
-}
-
-export function getDelivery(
-  deliveryId: string,
-): Promise<DeliveryResponse> {
-  return request<DeliveryResponse>(
-    `${BASE_URL}/${deliveryId}`,
-  );
+export function getDelivery(deliveryId: string): Promise<DeliveryResponse> {
+  return request<DeliveryResponse>(`${BASE_URL}/${deliveryId}`);
 }
 
 export function createDelivery(
@@ -45,50 +23,43 @@ export function createDelivery(
   });
 }
 
-export function startDelivery(
-  deliveryId: string,
-): Promise<DeliveryResponse> {
-  return request<DeliveryResponse>(
-    `${BASE_URL}/${deliveryId}/start`,
-    {
-      method: "POST",
-    },
-  );
+export function startDelivery(deliveryId: string): Promise<DeliveryResponse> {
+  return request<DeliveryResponse>(`${BASE_URL}/${deliveryId}/start`, {
+    method: "POST",
+  });
 }
 
 export function completeDelivery(
   deliveryId: string,
 ): Promise<DeliveryResponse> {
-  return request<DeliveryResponse>(
-    `${BASE_URL}/${deliveryId}/complete`,
-    {
-      method: "POST",
-    },
-  );
+  return request<DeliveryResponse>(`${BASE_URL}/${deliveryId}/complete`, {
+    method: "POST",
+  });
 }
 
 export function delayDelivery(
   deliveryId: string,
   input: DelayDeliveryRequest,
 ): Promise<DeliveryResponse> {
-  return request<DeliveryResponse>(
-    `${BASE_URL}/${deliveryId}/delay`,
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    },
-  );
+  return request<DeliveryResponse>(`${BASE_URL}/${deliveryId}/delay`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
 }
 
 export function cancelDelivery(
   deliveryId: string,
   input: CancelDeliveryRequest,
 ): Promise<DeliveryResponse> {
-  return request<DeliveryResponse>(
-    `${BASE_URL}/${deliveryId}/cancel`,
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    },
-  );
+  return request<DeliveryResponse>(`${BASE_URL}/${deliveryId}/cancel`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function setParcelWeight(deliveryId: string, parcelWeightKg: number) {
+  return request<DeliveryResponse>(`${BASE_URL}/${deliveryId}/parcel-weight`, {
+    method: "PATCH",
+    body: JSON.stringify({ parcelWeightKg }),
+  });
 }

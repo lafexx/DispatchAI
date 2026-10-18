@@ -12,6 +12,7 @@ export interface DeliveryResponse {
 
   pickupAddress: string;
   destinationAddress: string;
+  parcelWeightKg: number | null;
 
   status: DeliveryStatus;
 
@@ -27,6 +28,7 @@ export interface CreateDeliveryRequest {
   customerId: string;
   pickupAddress: string;
   destinationAddress: string;
+  parcelWeightKg: number;
 }
 
 export interface DelayDeliveryRequest {

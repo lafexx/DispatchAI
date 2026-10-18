@@ -1,7 +1,8 @@
 export type AssignmentStatus =
   | "ACTIVE"
   | "COMPLETED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "REJECTED";
 
 export interface AssignmentResponse {
   id: string;
@@ -24,4 +25,18 @@ export interface CreateAssignmentRequest {
 export interface AutoAssignRequest {
   deliveryId: string;
   vehicleId?: string | null;
+}
+
+export interface EligibleVehicle {
+  id: string;
+  registration: string;
+  type: string;
+  capacityKg: number;
+  available: boolean;
+}
+export interface DispatchEligibilityResponse {
+  deliveryId: string;
+  parcelWeightKg: number;
+  availableDrivers: import("../fleet/fleet.contracts").DriverResponse[];
+  eligibleVehicles: EligibleVehicle[];
 }
