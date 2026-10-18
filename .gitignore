@@ -1,0 +1,5 @@
+# durable local messaging state
+**/data/
+**/*.mv.db
+**/*.trace.db
+outbox-smoke-state.json
