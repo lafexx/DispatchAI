@@ -20,7 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.dispatchai.customer.domain.exceptions.CustomerNotFoundException;
+import com.dispatchai.customer.domain.exception.CustomerNotFoundException;
 import com.dispatchai.customer.domain.model.Customer;
 import com.dispatchai.customer.domain.model.Notification;
 import com.dispatchai.customer.domain.model.NotificationStatus;
@@ -29,9 +29,9 @@ import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCancelledE
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCompletedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryDelayedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryStartedEvent;
-import com.dispatchai.customer.infrastructure.messaging.event.DriverAssignedEvent;
-import com.dispatchai.customer.infrastructure.persistence.CustomerJpaRepository;
-import com.dispatchai.customer.infrastructure.persistence.NotificationJpaRepository;
+import com.dispatchai.customer.infrastructure.messaging.event.DeliveryAssignedEvent;
+import com.dispatchai.customer.infrastructure.persistence.repository.CustomerJpaRepository;
+import com.dispatchai.customer.infrastructure.persistence.repository.NotificationJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationApplicationServiceTest {
@@ -112,7 +112,7 @@ class NotificationApplicationServiceTest {
     when(customerRepository.findById(customerId))
         .thenReturn(Optional.of(customer(customerId)));
 
-    var event = new DriverAssignedEvent(
+    var event = new DeliveryAssignedEvent(
         eventId,
         UUID.randomUUID(),
         deliveryId,

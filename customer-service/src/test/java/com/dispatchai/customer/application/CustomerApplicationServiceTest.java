@@ -16,9 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.dispatchai.customer.domain.exceptions.CustomerNotFoundException;
+import com.dispatchai.customer.domain.exception.CustomerNotFoundException;
 import com.dispatchai.customer.domain.model.Customer;
-import com.dispatchai.customer.infrastructure.persistence.CustomerJpaRepository;
+import com.dispatchai.customer.infrastructure.persistence.repository.CustomerJpaRepository;
 import com.dispatchai.customer.presentation.dto.CreateCustomerRequest;
 
 @ExtendWith(MockitoExtension.class)

@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.dispatchai.customer.domain.exceptions.CustomerNotFoundException;
+import com.dispatchai.customer.domain.exception.CustomerNotFoundException;
 import com.dispatchai.customer.domain.model.Customer;
-import com.dispatchai.customer.infrastructure.persistence.CustomerJpaRepository;
+import com.dispatchai.customer.infrastructure.persistence.repository.CustomerJpaRepository;
 import com.dispatchai.customer.presentation.dto.CreateCustomerRequest;
 import com.dispatchai.customer.presentation.dto.CustomerResponse;
 

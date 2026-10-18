@@ -6,16 +6,16 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.dispatchai.customer.domain.exceptions.CustomerNotFoundException;
+import com.dispatchai.customer.domain.exception.CustomerNotFoundException;
 import com.dispatchai.customer.domain.model.Notification;
 import com.dispatchai.customer.domain.model.NotificationType;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCancelledEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryCompletedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryDelayedEvent;
 import com.dispatchai.customer.infrastructure.messaging.event.DeliveryStartedEvent;
-import com.dispatchai.customer.infrastructure.messaging.event.DriverAssignedEvent;
-import com.dispatchai.customer.infrastructure.persistence.CustomerJpaRepository;
-import com.dispatchai.customer.infrastructure.persistence.NotificationJpaRepository;
+import com.dispatchai.customer.infrastructure.messaging.event.DeliveryAssignedEvent;
+import com.dispatchai.customer.infrastructure.persistence.repository.CustomerJpaRepository;
+import com.dispatchai.customer.infrastructure.persistence.repository.NotificationJpaRepository;
 import com.dispatchai.customer.presentation.dto.NotificationResponse;
 
 @Service
@@ -38,8 +38,9 @@ public class NotificationApplicationService {
     return toResponse(notifications);
   }
 
+  @org.springframework.transaction.annotation.Transactional
   public void notifyDriverAssigned(
-      DriverAssignedEvent event) {
+      DeliveryAssignedEvent event) {
 
     createNotification(
         event.eventId(),
@@ -49,6 +50,7 @@ public class NotificationApplicationService {
         "A driver has been assigned to your delivery.");
   }
 
+  @org.springframework.transaction.annotation.Transactional
   public void notifyDeliveryStarted(
       DeliveryStartedEvent event) {
 
@@ -60,6 +62,7 @@ public class NotificationApplicationService {
         "Your delivery is now in transit.");
   }
 
+  @org.springframework.transaction.annotation.Transactional
   public void notifyDeliveryCompleted(
       DeliveryCompletedEvent event) {
 
@@ -71,6 +74,7 @@ public class NotificationApplicationService {
         "Your delivery has been completed.");
   }
 
+  @org.springframework.transaction.annotation.Transactional
   public void notifyDeliveryCancelled(
       DeliveryCancelledEvent event) {
 
@@ -82,6 +86,7 @@ public class NotificationApplicationService {
         "Your delivery has been cancelled: " + event.reason());
   }
 
+  @org.springframework.transaction.annotation.Transactional
   public void notifyDeliveryDelayed(
       DeliveryDelayedEvent event) {
 
