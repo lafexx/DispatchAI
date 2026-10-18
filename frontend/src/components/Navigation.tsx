@@ -1,45 +1,64 @@
 import { NavLink } from "react-router";
-
-const items = [
-  {
-    to: "/dashboard",
-    label: "Dashboard",
-  },
-  {
-    to: "/drivers",
-    label: "Drivers",
-  },
+import { useDeliverySummary } from "@/features/deliveries/hooks";
+import { Icon, type IconName } from "./Icon";
+import { Avatar } from "./UI";
+const items: { to: string; label: string; icon: IconName }[] = [
+  { to: "/dashboard", label: "Overview", icon: "overview" },
+  { to: "/deliveries", label: "Deliveries", icon: "package" },
+  { to: "/dispatch", label: "Dispatch", icon: "dispatch" },
+  { to: "/fleet", label: "Fleet", icon: "truck" },
+  { to: "/analytics", label: "Analytics", icon: "chart" },
+  { to: "/assistant", label: "AI assistant", icon: "spark" },
 ];
-
 export function Navigation() {
+  const summary = useDeliverySummary();
   return (
-    <nav className="border-b border-zinc-800 bg-zinc-950">
-      <div className="mx-auto flex max-w-7xl items-center gap-8 px-4 sm:px-6 lg:px-8">
-        <div className="py-4">
-          <span className="text-sm font-semibold tracking-wide text-zinc-100">
-            DispatchAI
-          </span>
+    <aside className="sidebar">
+      <NavLink to="/dashboard" className="brand" aria-label="DispatchAI home">
+        <span className="brand-mark">
+          <Icon name="dispatch" size={21} />
+        </span>
+        <span>
+          Dispatch<em>AI</em>
+        </span>
+      </NavLink>
+      <p className="nav-label">WORKSPACE</p>
+      <nav aria-label="Main navigation">
+        {items.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+          >
+            <Icon name={item.icon} />
+            {item.label}
+            {item.to === "/dispatch" &&
+              summary.data &&
+              summary.data.pending > 0 && (
+                <span className="nav-count">{summary.data.pending}</span>
+              )}
+          </NavLink>
+        ))}
+      </nav>
+      <div className="sidebar-bottom">
+        <div className="sidebar-note">
+          <div className="flex items-center gap-2 text-xs text-mint">
+            <Icon name="spark" size={15} />
+            <strong>Decisions, with context.</strong>
+          </div>
+          <p>Compare available resources and get advice before you dispatch.</p>
+          <NavLink to="/dispatch" className="link-button mt-3">
+            Open dispatch <Icon name="arrow" size={13} />
+          </NavLink>
         </div>
-
-        <div className="flex gap-1">
-          {items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                [
-                  "rounded-md px-3 py-2 text-sm font-medium transition",
-                  isActive
-                    ? "bg-zinc-800 text-zinc-100"
-                    : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300",
-                ].join(" ")
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+        <div className="workspace-person">
+          <Avatar name="Operations" small />
+          <div>
+            <strong>Operations workspace</strong>
+            <p>DispatchAI · Internal</p>
+          </div>
         </div>
       </div>
-    </nav>
+    </aside>
   );
 }

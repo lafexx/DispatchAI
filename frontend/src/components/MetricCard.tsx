@@ -1,29 +1,27 @@
-interface MetricCardProps {
-  label: string;
-  value: string | number;
-  description?: string;
-}
-
+import { Icon, type IconName } from "./Icon";
 export function MetricCard({
   label,
   value,
   description,
-}: MetricCardProps) {
+  icon = "chart",
+  tone = "mint",
+}: {
+  label: string;
+  value: string | number;
+  description?: string;
+  icon?: IconName;
+  tone?: "mint" | "blue" | "amber" | "purple";
+}) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-      <p className="text-sm font-medium text-zinc-400">
-        {label}
-      </p>
-
-      <p className="mt-2 text-3xl font-semibold tracking-tight text-zinc-100">
-        {value}
-      </p>
-
-      {description && (
-        <p className="mt-1 text-sm text-zinc-500">
-          {description}
-        </p>
-      )}
+    <div className={`metric-card tone-${tone}`}>
+      <div className="metric-label">
+        <span>{label}</span>
+        <span className="metric-icon">
+          <Icon name={icon} />
+        </span>
+      </div>
+      <p className="metric-value">{value}</p>
+      {description && <p className="metric-description">{description}</p>}
     </div>
   );
 }
