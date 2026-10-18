@@ -46,83 +46,31 @@ public class AnalyticsQueryService {
   }
 
   public DeliverySummaryResponse getSummary() {
-    var deliveries = getAllDeliveries();
+    ReadOnlyKeyValueStore<String, com.dispatchai.analytics.domain.model.SummaryAggregate> store =
+        interactiveQueryService.getQueryableStore("delivery-summary-store", QueryableStoreTypes.keyValueStore());
+    var summary = store.get("all");
+    return com.dispatchai.analytics.application.mapper.DeliverySummaryMapper.toResponse(
+        summary == null ? com.dispatchai.analytics.domain.model.SummaryAggregate.empty() : summary);
+  }
 
-    long total = deliveries.size();
-
-    long pending = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.PENDING)
-        .count();
-
-    long assigned = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.ASSIGNED)
-        .count();
-
-    long inTransit = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.IN_TRANSIT)
-        .count();
-
-    long completed = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.COMPLETED)
-        .count();
-
-    long cancelled = deliveries.stream()
-        .filter(d -> d.status() == AnalyticsDeliveryStatus.CANCELLED)
-        .count();
-
-    long delayed = deliveries.stream()
-        .filter(DeliveryAnalyticsState::delayed)
-        .count();
-
-    double averageDelayMinutes = deliveries.stream()
-        .filter(d -> d.delayMinutes() != null)
-        .mapToInt(DeliveryAnalyticsState::delayMinutes)
-        .average()
-        .orElse(0.0);
-
-    double averageAssignmentTimeSeconds = deliveries.stream()
-        .filter(d -> d.createdAt() != null && d.assignedAt() != null)
-        .mapToLong(d -> Duration.between(
-            d.createdAt(),
-            d.assignedAt()).toMillis())
-        .average()
-        .orElse(0.0) / 1000.0;
-
-    double averageDeliveryTimeSeconds = deliveries.stream()
-        .filter(d -> d.createdAt() != null && d.completedAt() != null)
-        .mapToLong(d -> Duration.between(
-            d.createdAt(),
-            d.completedAt()).toMillis())
-        .average()
-        .orElse(0.0) / 1000.0;
-
-    double averageTransitTimeSeconds = deliveries.stream()
-        .filter(d -> d.startedAt() != null && d.completedAt() != null)
-        .mapToLong(d -> Duration.between(
-            d.startedAt(),
-            d.completedAt()).toMillis())
-        .average()
-        .orElse(0.0) / 1000.0;
-
-    double completionRate = total == 0 ? 0.0 : (double) completed / total;
-    double cancellationRate = total == 0 ? 0.0 : (double) cancelled / total;
-    double delayRate = total == 0 ? 0.0 : (double) delayed / total;
-
-    return new DeliverySummaryResponse(
-        total,
-        pending,
-        assigned,
-        inTransit,
-        completed,
-        cancelled,
-        delayed,
-        averageDelayMinutes,
-        averageAssignmentTimeSeconds,
-        averageDeliveryTimeSeconds,
-        averageTransitTimeSeconds,
-        completionRate,
-        cancellationRate,
-        delayRate);
+  public List<com.dispatchai.analytics.presentation.dto.TimeBucketResponse> getHistory(String metric, int minutes) {
+    if (minutes < 1 || minutes > 1440) throw new IllegalArgumentException("minutes must be between 1 and 1440");
+    ReadOnlyKeyValueStore<String, com.dispatchai.analytics.domain.model.WindowActivity> store =
+        interactiveQueryService.getQueryableStore(metric + "-history-store", QueryableStoreTypes.keyValueStore());
+    long current = java.time.Instant.now().toEpochMilli() / 60000 * 60000;
+    int size = metric.equals("delay") ? 5 : 1;
+    var result = new ArrayList<com.dispatchai.analytics.presentation.dto.TimeBucketResponse>();
+    // Delay points end at the last complete minute; throughput includes the open current minute.
+    long lastStart = metric.equals("delay") ? current - size * 60000L : current;
+    for (long start = lastStart - (minutes - 1L) * 60000; start <= lastStart; start += 60000) {
+      var value = store.get(Long.toString(start));
+      if (value == null) value = com.dispatchai.analytics.domain.model.WindowActivity.empty();
+      result.add(new com.dispatchai.analytics.presentation.dto.TimeBucketResponse(
+          java.time.Instant.ofEpochMilli(start), java.time.Instant.ofEpochMilli(start + size * 60000L),
+          value.created(), value.completed(), value.active(), value.delayed(),
+          value.active() == 0 ? null : (double)value.delayed()/value.active()));
+    }
+    return result;
   }
 
   public DriverAnalyticsResponse getDriverAnalytics(UUID driverId) {

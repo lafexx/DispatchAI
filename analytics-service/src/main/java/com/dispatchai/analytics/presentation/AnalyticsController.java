@@ -24,6 +24,26 @@ public class AnalyticsController {
     this.queryService = queryService;
   }
 
+  @GetMapping("/throughput")
+  public List<com.dispatchai.analytics.presentation.dto.TimeBucketResponse> throughput(
+      @org.springframework.web.bind.annotation.RequestParam(defaultValue="60") int minutes) {
+    return history("throughput", minutes);
+  }
+  @GetMapping("/delay-rate")
+  public List<com.dispatchai.analytics.presentation.dto.TimeBucketResponse> delayRate(
+      @org.springframework.web.bind.annotation.RequestParam(defaultValue="60") int minutes) {
+    return history("delay", minutes);
+  }
+  private List<com.dispatchai.analytics.presentation.dto.TimeBucketResponse> history(String metric, int minutes) {
+    if (minutes < 1 || minutes > 1440) throw new org.springframework.web.server.ResponseStatusException(
+        org.springframework.http.HttpStatus.BAD_REQUEST, "minutes must be between 1 and 1440");
+    try { return queryService.getHistory(metric, minutes); }
+    catch (org.apache.kafka.streams.errors.InvalidStateStoreException e) {
+      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+          "Analytics stores are restoring; retry shortly", e);
+    }
+  }
+
   @GetMapping("/summary")
   public DeliverySummaryResponse summary() {
     return queryService.getSummary();
