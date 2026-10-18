@@ -1,0 +1,7 @@
+services:
+  delivery-service:
+    environment:
+      MESSAGING_OUTBOX_ENABLED: "false"
+  dispatch-service:
+    environment:
+      MESSAGING_OUTBOX_ENABLED: "false"
