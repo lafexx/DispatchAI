@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.dispatchai.dispatch.domain.model.exceptions.InvalidAssignmentStateException;
+import com.dispatchai.dispatch.domain.exception.InvalidAssignmentStateException;
 
 class DeliveryAssignmentTest {
 

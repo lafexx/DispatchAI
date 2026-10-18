@@ -1,504 +1,212 @@
 package com.dispatchai.dispatch.application;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import java.time.Instant;
+import java.util.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.dispatchai.dispatch.domain.model.AssignmentStatus;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.SimpleTransactionStatus;
+import com.dispatchai.dispatch.infrastructure.client.delivery.dto.RemoteDeliveryStatus;
 import com.dispatchai.dispatch.domain.model.DeliveryAssignment;
-import com.dispatchai.dispatch.domain.model.RemoteDeliveryStatus;
-import com.dispatchai.dispatch.domain.model.exceptions.AssignmentNotFoundException;
-import com.dispatchai.dispatch.domain.model.exceptions.DeliveryNotAssignableException;
-import com.dispatchai.dispatch.domain.model.exceptions.DeliveryNotFoundException;
-import com.dispatchai.dispatch.domain.model.exceptions.NoAvailableDriverException;
-import com.dispatchai.dispatch.infrastructure.delivery.DeliveryClient;
-import com.dispatchai.dispatch.infrastructure.delivery.DeliveryResponse;
-import com.dispatchai.dispatch.infrastructure.fleet.FleetClient;
-import com.dispatchai.dispatch.infrastructure.fleet.FleetDriverResponse;
-import com.dispatchai.dispatch.infrastructure.messaging.AssignmentEventPublisher;
-import com.dispatchai.dispatch.infrastructure.messaging.DriverAssignedEvent;
-import com.dispatchai.dispatch.infrastructure.persistence.DeliveryAssignmentJpaRepository;
+import com.dispatchai.dispatch.domain.model.AssignmentStatus;
+import com.dispatchai.dispatch.domain.model.DeliveryAssignmentLifecycle;
+import com.dispatchai.dispatch.domain.exception.DeliveryNotAssignableException;
+import com.dispatchai.dispatch.domain.exception.AssignmentNotFoundException;
+import com.dispatchai.dispatch.domain.exception.NoAvailableDriverException;
+import com.dispatchai.dispatch.domain.exception.ReservationConflictException;
+import com.dispatchai.dispatch.infrastructure.client.delivery.dto.DeliveryResponse;
+import com.dispatchai.dispatch.infrastructure.client.delivery.DeliveryClient;
+import com.dispatchai.dispatch.infrastructure.client.fleet.dto.DriverResponse;
+import com.dispatchai.dispatch.infrastructure.client.fleet.FleetClient;
+import com.dispatchai.dispatch.infrastructure.client.fleet.dto.ReservationResponse;
+import com.dispatchai.dispatch.infrastructure.client.fleet.dto.VehicleResponse;
+import com.dispatchai.dispatch.infrastructure.client.fleet.dto.ReservationRequest;
+import com.dispatchai.dispatch.infrastructure.messaging.event.DriverAssignedEvent;
+import com.dispatchai.dispatch.infrastructure.messaging.publisher.AssignmentEventPublisher;
+import com.dispatchai.dispatch.infrastructure.persistence.repository.DeliveryAssignmentJpaRepository;
+import com.dispatchai.dispatch.infrastructure.persistence.store.DeliveryAssignmentLifecycleStore;
 import com.dispatchai.dispatch.presentation.dto.CreateAssignmentRequest;
 
 @ExtendWith(MockitoExtension.class)
 class DispatchApplicationServiceTest {
+  @Mock FleetClient fleet;
+  @Mock DeliveryClient deliveries;
+  @Mock DeliveryAssignmentJpaRepository repository;
+  @Mock AssignmentEventPublisher publisher;
+  @Mock DeliveryAssignmentLifecycleStore lifecycles;
+  @Mock ReservationCleanupService cleanup;
+  @Mock PlatformTransactionManager manager;
+  @InjectMocks DispatchApplicationService service;
+  private final Map<UUID, DeliveryAssignment> saved = new HashMap<>();
+  private final UUID customer = UUID.randomUUID();
+  private DeliveryResponse pending(UUID id) { return new DeliveryResponse(id, customer, null, "Pickup", "Destination", RemoteDeliveryStatus.PENDING); }
 
-  @Mock
-  private FleetClient fleetClient;
+  @BeforeEach void defaults() {
+    lenient().when(fleet.getVehicles()).thenReturn(java.util.List.of(new VehicleResponse(
+        UUID.fromString("00000000-0000-0000-0000-000000000001"), "TEST", "VAN", java.math.BigDecimal.valueOf(1200), true)));
 
-  @Mock
-  private DeliveryClient deliveryClient;
+    lenient().when(manager.getTransaction(any())).thenReturn(new SimpleTransactionStatus());
+    lenient().when(lifecycles.lock(any())).thenAnswer(call -> new DeliveryAssignmentLifecycle(call.getArgument(0)));
+    lenient().when(deliveries.getDelivery(any())).thenAnswer(call -> pending(call.getArgument(0)));
+    lenient().when(fleet.reserve(any(), any())).thenAnswer(call -> {
+      ReservationRequest request = call.getArgument(1);
+      return new ReservationResponse(call.getArgument(0), request.deliveryId(), request.driverId(), request.vehicleId(), "RESERVED", Instant.now().plusSeconds(120));
+    });
+    lenient().when(repository.saveAndFlush(any())).thenAnswer(call -> {
+      DeliveryAssignment assignment = call.getArgument(0); saved.put(assignment.getId(), assignment); return assignment;
+    });
+    lenient().when(repository.findById(any())).thenAnswer(call -> Optional.ofNullable(saved.get(call.getArgument(0))));
+    lenient().when(repository.findFirstByDeliveryIdAndStatusOrderByAssignedAtDesc(any(), any())).thenAnswer(call ->
+        saved.values().stream().filter(a -> a.getDeliveryId().equals(call.getArgument(0)) && a.getStatus() == call.getArgument(1)).findFirst());
+    lenient().when(repository.findByDeliveryIdAndStatus(any(), any())).thenAnswer(call ->
+        saved.values().stream().filter(a -> a.getDeliveryId().equals(call.getArgument(0)) && a.getStatus() == call.getArgument(1)).toList());
+    lenient().when(repository.findByDeliveryId(any())).thenAnswer(call ->
+        saved.values().stream().filter(a -> a.getDeliveryId().equals(call.getArgument(0))).max(Comparator.comparing(DeliveryAssignment::getAssignedAt)));
+    lenient().when(repository.findByDriverId(any())).thenAnswer(call ->
+        saved.values().stream().filter(a -> a.getDriverId().equals(call.getArgument(0))).toList());
+  }
 
-  @Mock
-  private DeliveryAssignmentJpaRepository repository;
-
-  @Mock
-  private AssignmentEventPublisher eventPublisher;
-
-  @InjectMocks
-  private DispatchApplicationService service;
-
-  @Test
-  void createPersistsAssignmentAndPublishesEvent() {
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-    var vehicleId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getDriver(driverId))
-        .thenReturn(new FleetDriverResponse(
-            driverId,
-            "Alex Smith",
-            "AVAILABLE"));
-
-    var request = new CreateAssignmentRequest(
-        deliveryId,
-        driverId,
-        vehicleId);
-
-    var result = service.create(request);
-
-    assertEquals(deliveryId, result.deliveryId());
-    assertEquals(driverId, result.driverId());
-    assertEquals(vehicleId, result.vehicleId());
+  @Test void createReservesAndEnqueuesBeforeCommit() {
+    var delivery = UUID.randomUUID(); var driver = UUID.randomUUID(); var vehicle = UUID.randomUUID();
+    when(fleet.getVehicles()).thenReturn(List.of(new VehicleResponse(vehicle,"EXPLICIT","VAN",java.math.BigDecimal.valueOf(1200),true)));
+    var result = service.create(new CreateAssignmentRequest(delivery, driver, vehicle));
     assertEquals(AssignmentStatus.ACTIVE, result.status());
-
-    verify(repository)
-        .save(any(DeliveryAssignment.class));
-
-    verify(eventPublisher)
-        .publish(any(DriverAssignedEvent.class));
+    var order = inOrder(fleet, repository, manager, publisher);
+    order.verify(fleet).reserve(eq(result.id()), eq(new ReservationRequest(delivery, driver, vehicle)));
+    order.verify(repository).saveAndFlush(any()); order.verify(publisher).publish(any(DriverAssignedEvent.class)); order.verify(manager).commit(any());
+    var event = ArgumentCaptor.forClass(DriverAssignedEvent.class); verify(publisher).publish(event.capture());
+    assertEquals(customer, event.getValue().customerId()); assertEquals(result.id(), event.getValue().assignmentId());
   }
 
-  @Test
-  void createPublishesExpectedDriverAssignedEvent() {
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-    var vehicleId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getDriver(driverId))
-        .thenReturn(new FleetDriverResponse(
-            driverId,
-            "Alex Smith",
-            "AVAILABLE"));
-
-    service.create(
-        new CreateAssignmentRequest(
-            deliveryId,
-            driverId,
-            vehicleId));
-
-    var captor = ArgumentCaptor.forClass(DriverAssignedEvent.class);
-
-    verify(eventPublisher).publish(captor.capture());
-
-    var event = captor.getValue();
-
-    assertNotNull(event.eventId());
-    assertNotNull(event.assignmentId());
-    assertEquals(deliveryId, event.deliveryId());
-    assertEquals(driverId, event.driverId());
-    assertEquals(vehicleId, event.vehicleId());
-    assertNotNull(event.occurredAt());
+  @Test void duplicateManualRequestReusesSameAssignmentAndDoesNotReserveAgain() {
+    var request = new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null);
+    var first = service.create(request); var second = service.create(request);
+    assertEquals(first.id(), second.id()); verify(fleet, times(1)).reserve(any(), any());
+    verify(publisher, times(1)).publish(any(DriverAssignedEvent.class));
   }
 
-  @Test
-  void createRejectsNonPendingDelivery() {
-    var deliveryId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(
-            new DeliveryResponse(
-                deliveryId,
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                "Sydney",
-                "Wollongong",
-                RemoteDeliveryStatus.ASSIGNED));
-
-    var request = new CreateAssignmentRequest(
-        deliveryId,
-        UUID.randomUUID(),
-        null);
-
-    assertThrows(
-        DeliveryNotAssignableException.class,
-        () -> service.create(request));
-
-    verify(fleetClient, never())
-        .getDriver(any());
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void conflictingActiveRequestIsRejectedWithoutReplacingIt() {
+    var delivery = UUID.randomUUID(); var first = service.create(new CreateAssignmentRequest(delivery, UUID.randomUUID(), null));
+    assertThrows(ReservationConflictException.class, () -> service.create(new CreateAssignmentRequest(delivery, UUID.randomUUID(), null)));
+    assertEquals(1, saved.size()); assertEquals(AssignmentStatus.ACTIVE, service.getByAssignmentId(first.id()).status());
   }
 
-  @Test
-  void createRejectsDeliveryWithExistingActiveAssignment() {
-    var deliveryId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(true);
-
-    var request = new CreateAssignmentRequest(
-        deliveryId,
-        UUID.randomUUID(),
-        null);
-
-    assertThrows(
-        IllegalStateException.class,
-        () -> service.create(request));
-
-    verify(fleetClient, never())
-        .getDriver(any());
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void unavailableResourceConflictDoesNotPersistOrPublish() {
+    doThrow(new ReservationConflictException("Driver busy")).when(fleet).reserve(any(), any());
+    assertThrows(ReservationConflictException.class,
+        () -> service.create(new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null)));
+    assertTrue(saved.isEmpty()); verifyNoInteractions(publisher); verify(cleanup).compensate(any(), any());
   }
 
-  @Test
-  void createRejectsUnavailableDriver() {
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getDriver(driverId))
-        .thenReturn(new FleetDriverResponse(
-            driverId,
-            "Alex Smith",
-            "UNAVAILABLE"));
-
-    var request = new CreateAssignmentRequest(
-        deliveryId,
-        driverId,
-        null);
-
-    assertThrows(
-        IllegalStateException.class,
-        () -> service.create(request));
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void cancellationWinningDuringReserveTriggersCompensation() {
+    var delivery = UUID.randomUUID();
+    when(deliveries.getDelivery(delivery)).thenReturn(pending(delivery),
+        new DeliveryResponse(delivery, customer, null, "Pickup", "Destination", RemoteDeliveryStatus.CANCELLED));
+    assertThrows(DeliveryNotAssignableException.class,
+        () -> service.create(new CreateAssignmentRequest(delivery, UUID.randomUUID(), null)));
+    assertTrue(saved.isEmpty()); verifyNoInteractions(publisher);
+    var order = inOrder(manager, cleanup); order.verify(manager).rollback(any()); order.verify(cleanup).compensate(any(), any());
   }
 
-  @Test
-  void autoAssignUsesFirstAvailableDriver() {
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getAvailableDrivers())
-        .thenReturn(List.of(
-            new FleetDriverResponse(
-                driverId,
-                "Alex Smith",
-                "AVAILABLE")));
-
-    var result = service.autoAssign(
-        deliveryId,
-        null);
-
-    assertEquals(deliveryId, result.deliveryId());
-    assertEquals(driverId, result.driverId());
-    assertEquals(AssignmentStatus.ACTIVE, result.status());
-
-    verify(repository)
-        .save(any(DeliveryAssignment.class));
-
-    verify(eventPublisher)
-        .publish(any(DriverAssignedEvent.class));
+  @Test void localPersistenceFailureCompensatesAfterRollback() {
+    doThrow(new IllegalStateException("DB failure")).when(repository).saveAndFlush(any());
+    assertThrows(IllegalStateException.class,
+        () -> service.create(new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null)));
+    verifyNoInteractions(publisher);
+    var order = inOrder(manager, cleanup); order.verify(manager).rollback(any()); order.verify(cleanup).compensate(any(), any());
   }
 
-  @Test
-  void autoAssignPublishesExpectedDriverAssignedEvent() {
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-    var vehicleId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getAvailableDrivers())
-        .thenReturn(List.of(
-            new FleetDriverResponse(
-                driverId,
-                "Alex Smith",
-                "AVAILABLE")));
-
-    service.autoAssign(
-        deliveryId,
-        vehicleId);
-
-    var captor = ArgumentCaptor.forClass(DriverAssignedEvent.class);
-
-    verify(eventPublisher).publish(captor.capture());
-
-    var event = captor.getValue();
-
-    assertNotNull(event.eventId());
-    assertNotNull(event.assignmentId());
-    assertEquals(deliveryId, event.deliveryId());
-    assertEquals(driverId, event.driverId());
-    assertEquals(vehicleId, event.vehicleId());
-    assertNotNull(event.occurredAt());
+  @Test void uncertainReserveResponseStillUsesSameTokenForCompensation() {
+    var ids = ArgumentCaptor.forClass(UUID.class);
+    doThrow(new IllegalStateException("Timed out after Fleet may have committed")).when(fleet).reserve(any(), any());
+    assertThrows(IllegalStateException.class,
+        () -> service.create(new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null)));
+    verify(fleet).reserve(ids.capture(), any()); verify(cleanup).compensate(eq(ids.getValue()), any());
   }
 
-  @Test
-  void autoAssignRejectsNonPendingDelivery() {
-    var deliveryId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(
-            new DeliveryResponse(
-                deliveryId,
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                "Sydney",
-                "Wollongong",
-                RemoteDeliveryStatus.ASSIGNED));
-
-    assertThrows(
-        DeliveryNotAssignableException.class,
-        () -> service.autoAssign(
-            deliveryId,
-            null));
-
-    verify(fleetClient, never())
-        .getAvailableDrivers();
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void outboxWriteFailureRollsBackAndCompensatesInsteadOfCommittingAnEventlessAssignment() {
+    doThrow(new IllegalStateException("Outbox DB failure")).when(publisher).publish(any(DriverAssignedEvent.class));
+    assertThrows(IllegalStateException.class,
+        () -> service.create(new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null)));
+    var order = inOrder(manager, cleanup);
+    order.verify(manager).rollback(any()); order.verify(cleanup).compensate(any(), any());
+    verify(manager, never()).commit(any());
   }
 
-  @Test
-  void autoAssignRejectsDeliveryWithExistingActiveAssignment() {
-    var deliveryId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(true);
-
-    assertThrows(
-        IllegalStateException.class,
-        () -> service.autoAssign(
-            deliveryId,
-            null));
-
-    verify(fleetClient, never())
-        .getAvailableDrivers();
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void rejectionQueuesCleanupBeforeCommitWithoutCallingFleetInline() {
+    var request = new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null);
+    var assignment = service.create(request);
+    clearInvocations(manager, cleanup, fleet);
+    service.rejectAssignment(assignment.id(), request.deliveryId(), "Expired", Instant.now());
+    var order = inOrder(cleanup, manager); order.verify(cleanup).enqueue(eq(assignment.id()), any());
+    order.verify(manager).commit(any()); verify(fleet, never()).release(any(), any());
   }
 
-  @Test
-  void autoAssignRejectsWhenAvailableDriversIsEmpty() {
-    var deliveryId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getAvailableDrivers())
-        .thenReturn(List.of());
-
-    assertThrows(
-        NoAvailableDriverException.class,
-        () -> service.autoAssign(
-            deliveryId,
-            null));
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void rejectionAllowsNewAttemptAndLateOldRejectionCannotCloseTheNewOne() {
+    var request = new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null);
+    var first = service.create(request); service.rejectAssignment(first.id(), request.deliveryId(), "Expired", Instant.now());
+    var second = service.create(request); assertNotEquals(first.id(), second.id());
+    service.rejectAssignment(first.id(), request.deliveryId(), "Duplicate rejection", Instant.now());
+    assertEquals(AssignmentStatus.ACTIVE, service.getByAssignmentId(second.id()).status());
+    assertEquals(AssignmentStatus.REJECTED, service.getByAssignmentId(first.id()).status());
   }
 
-  @Test
-  void autoAssignRejectsWhenAvailableDriversIsNull() {
-    var deliveryId = UUID.randomUUID();
-
-    when(deliveryClient.getDelivery(deliveryId))
-        .thenReturn(pendingDelivery(deliveryId));
-
-    when(repository.existsByDeliveryIdAndStatus(
-        deliveryId,
-        AssignmentStatus.ACTIVE))
-        .thenReturn(false);
-
-    when(fleetClient.getAvailableDrivers())
-        .thenReturn(null);
-
-    assertThrows(
-        NoAvailableDriverException.class,
-        () -> service.autoAssign(
-            deliveryId,
-            null));
-
-    verify(repository, never())
-        .save(any());
-
-    verify(eventPublisher, never())
-        .publish(any(DriverAssignedEvent.class));
+  @Test void cancellationRejectionRecordsTerminalKnowledgeAndClosesAssignment() {
+    var request = new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null); var assigned = service.create(request);
+    service.rejectAssignment(assigned.id(), request.deliveryId(), "Cancelled", "CANCELLED", Instant.now());
+    assertEquals(AssignmentStatus.CANCELLED, service.getByAssignmentId(assigned.id()).status());
   }
 
-  @Test
-  void getByAssignmentIdReturnsAssignment() {
-    var assignmentId = UUID.randomUUID();
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-
-    var assignment = new DeliveryAssignment(
-        assignmentId,
-        deliveryId,
-        driverId,
-        null);
-
-    when(repository.findById(assignmentId))
-        .thenReturn(Optional.of(assignment));
-
-    var result = service.getByAssignmentId(assignmentId);
-
-    assertEquals(assignmentId, result.id());
-    assertEquals(deliveryId, result.deliveryId());
-    assertEquals(driverId, result.driverId());
-    assertEquals(AssignmentStatus.ACTIVE, result.status());
+  @Test void autoAssignmentTriesAnotherCandidateAfterAtomicConflict() {
+    var first = UUID.randomUUID(); var second = UUID.randomUUID();
+    when(fleet.getAvailableDrivers()).thenReturn(List.of(new DriverResponse(first, "A", "AVAILABLE"), new DriverResponse(second, "B", "AVAILABLE")));
+    doThrow(new ReservationConflictException("First candidate lost race")).when(fleet)
+        .reserve(any(), argThat((ReservationRequest r) -> r != null && first.equals(r.driverId())));
+    var result = service.autoAssign(UUID.randomUUID(), null); assertEquals(second, result.driverId());
   }
 
-  @Test
-  void getByAssignmentIdThrowsWhenAssignmentDoesNotExist() {
-    var assignmentId = UUID.randomUUID();
-
-    when(repository.findById(assignmentId))
-        .thenReturn(Optional.empty());
-
-    assertThrows(
-        AssignmentNotFoundException.class,
-        () -> service.getByAssignmentId(
-            assignmentId));
+  @Test void autoAssignmentRejectsNonPendingAndEmptyCandidates() {
+    var delivery = UUID.randomUUID();
+    when(deliveries.getDelivery(delivery)).thenReturn(new DeliveryResponse(delivery, customer, null, "P", "D", RemoteDeliveryStatus.CANCELLED));
+    assertThrows(DeliveryNotAssignableException.class, () -> service.autoAssign(delivery, null));
+    verify(fleet, never()).getAvailableDrivers();
+    when(fleet.getAvailableDrivers()).thenReturn(List.of());
+    assertThrows(NoAvailableDriverException.class, () -> service.autoAssign(UUID.randomUUID(), null));
   }
 
-  @Test
-  void getByDeliveryIdReturnsAssignment() {
-    var assignmentId = UUID.randomUUID();
-    var deliveryId = UUID.randomUUID();
-    var driverId = UUID.randomUUID();
-
-    var assignment = new DeliveryAssignment(
-        assignmentId,
-        deliveryId,
-        driverId,
-        null);
-
-    when(repository.findByDeliveryId(deliveryId))
-        .thenReturn(Optional.of(assignment));
-
-    var result = service.getByDeliveryId(deliveryId);
-
-    assertEquals(assignmentId, result.id());
-    assertEquals(deliveryId, result.deliveryId());
-    assertEquals(driverId, result.driverId());
+  @Test void queriesReturnAssignmentAndMissingAssignmentFails() {
+    var request = new CreateAssignmentRequest(UUID.randomUUID(), UUID.randomUUID(), null); var assigned = service.create(request);
+    assertEquals(assigned.id(), service.getByDeliveryId(request.deliveryId()).id());
+    assertEquals(1, service.getByDriverId(request.driverId()).size());
+    assertThrows(AssignmentNotFoundException.class, () -> service.getByAssignmentId(UUID.randomUUID()));
   }
 
-  @Test
-  void getByDeliveryIdThrowsWhenAssignmentDoesNotExist() {
-    var deliveryId = UUID.randomUUID();
-
-    when(repository.findByDeliveryId(deliveryId))
-        .thenReturn(Optional.empty());
-
-    assertThrows(
-        DeliveryNotFoundException.class,
-        () -> service.getByDeliveryId(
-            deliveryId));
+  @Test void overweightOrUnavailableVehicleCannotReachReservation() {
+    var delivery=UUID.randomUUID(); var vehicle=UUID.randomUUID();
+    when(deliveries.getDelivery(delivery)).thenReturn(new DeliveryResponse(delivery,customer,null,"P","D",RemoteDeliveryStatus.PENDING,new java.math.BigDecimal("100")));
+    when(fleet.getVehicles()).thenReturn(List.of(new VehicleResponse(vehicle,"SMALL","VAN",new java.math.BigDecimal("99.99"),true)));
+    assertThrows(ReservationConflictException.class,()->service.create(new CreateAssignmentRequest(delivery,UUID.randomUUID(),vehicle)));
+    verify(fleet,never()).reserve(any(),any()); verifyNoInteractions(publisher);
   }
-
-  private DeliveryResponse pendingDelivery(
-      UUID deliveryId) {
-
-    return new DeliveryResponse(
-        deliveryId,
-        UUID.randomUUID(),
-        null,
-        "Sydney",
-        "Wollongong",
-        RemoteDeliveryStatus.PENDING);
+  @Test void parcelWeightIsTakenFromDeliveryAndSentToFleet() {
+    var delivery=UUID.randomUUID();
+    when(deliveries.getDelivery(delivery)).thenReturn(new DeliveryResponse(delivery,customer,null,"P","D",RemoteDeliveryStatus.PENDING,new java.math.BigDecimal("500")));
+    service.create(new CreateAssignmentRequest(delivery,UUID.randomUUID(),null));
+    verify(fleet).reserve(any(),argThat(r -> r.parcelWeightKg().compareTo(new java.math.BigDecimal("500"))==0 && r.vehicleId()!=null));
+  }
+  @Test void changingWeightDuringReservationIsCompensatedBeforePublication() {
+    var delivery=UUID.randomUUID();
+    when(deliveries.getDelivery(delivery)).thenReturn(
+      new DeliveryResponse(delivery,customer,null,"P","D",RemoteDeliveryStatus.PENDING,new java.math.BigDecimal("100")),
+      new DeliveryResponse(delivery,customer,null,"P","D",RemoteDeliveryStatus.PENDING,new java.math.BigDecimal("101")));
+    assertThrows(ReservationConflictException.class,()->service.create(new CreateAssignmentRequest(delivery,UUID.randomUUID(),null)));
+    verify(cleanup).compensate(any(),argThat(r -> r.parcelWeightKg().compareTo(new java.math.BigDecimal("100"))==0));
+    verifyNoInteractions(publisher);
   }
 }

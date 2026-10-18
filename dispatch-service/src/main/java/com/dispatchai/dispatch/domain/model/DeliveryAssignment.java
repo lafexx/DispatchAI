@@ -3,7 +3,7 @@ package com.dispatchai.dispatch.domain.model;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.dispatchai.dispatch.domain.model.exceptions.InvalidAssignmentStateException;
+import com.dispatchai.dispatch.domain.exception.InvalidAssignmentStateException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ public class DeliveryAssignment {
   @Id
   private UUID id;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private UUID deliveryId;
 
   @Column(nullable = false)
@@ -33,6 +33,10 @@ public class DeliveryAssignment {
   private Instant assignedAt;
   private Instant completedAt;
   private Instant cancelledAt;
+  private Instant rejectedAt;
+  private String rejectionReason;
+  @Column(nullable = false)
+  private UUID assignmentEventId = UUID.randomUUID();
 
   protected DeliveryAssignment() {
   }
@@ -81,6 +85,48 @@ public class DeliveryAssignment {
 
     status = AssignmentStatus.CANCELLED;
     cancelledAt = Instant.now();
+  }
+
+  /** Consumer transition: idempotent, with the producer's event timestamp. */
+  public boolean applyTerminalState(AssignmentStatus terminal, Instant occurredAt) {
+    if (terminal != AssignmentStatus.COMPLETED && terminal != AssignmentStatus.CANCELLED) {
+      throw new IllegalArgumentException("A terminal assignment status is required");
+    }
+    java.util.Objects.requireNonNull(occurredAt, "Event time is required");
+    if (status != AssignmentStatus.ACTIVE) {
+      return false;
+    }
+    status = terminal;
+    if (terminal == AssignmentStatus.COMPLETED) {
+      completedAt = occurredAt;
+    } else {
+      cancelledAt = occurredAt;
+    }
+    return true;
+  }
+
+  public boolean reject(String reason, Instant occurredAt) {
+    java.util.Objects.requireNonNull(reason);
+    java.util.Objects.requireNonNull(occurredAt);
+    if (status != AssignmentStatus.ACTIVE) {
+      return false;
+    }
+    status = AssignmentStatus.REJECTED;
+    rejectionReason = reason;
+    rejectedAt = occurredAt;
+    return true;
+  }
+
+  public UUID getAssignmentEventId() {
+    return assignmentEventId;
+  }
+
+  public Instant getRejectedAt() {
+    return rejectedAt;
+  }
+
+  public String getRejectionReason() {
+    return rejectionReason;
   }
 
   public UUID getId() {

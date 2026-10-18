@@ -28,6 +28,11 @@ public class DispatchController {
     this.dispatchService = dispatchService;
   }
 
+  @GetMapping("/deliveries/{deliveryId}/eligibility")
+  public com.dispatchai.dispatch.presentation.dto.DispatchEligibilityResponse eligibility(@PathVariable UUID deliveryId) {
+    return dispatchService.eligibility(deliveryId);
+  }
+
   @PostMapping("/assignments")
   public ResponseEntity<AssignmentResponse> create(@Valid @RequestBody CreateAssignmentRequest request) {
     var result = dispatchService.create(request);
