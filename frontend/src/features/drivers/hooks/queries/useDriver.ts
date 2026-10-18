@@ -6,6 +6,6 @@ export function useDriver(driverId?: string) {
     queryKey: ["fleet", "drivers", driverId],
     queryFn: () => getDriver(driverId!),
     enabled: Boolean(driverId),
-    refetchInterval: 2000,
+    refetchInterval: 5000,
   });
 }

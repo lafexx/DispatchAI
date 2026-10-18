@@ -1,78 +1,138 @@
-import {
-  useDriver,
-  useDriverAnalytics,
-} from "@/features/drivers/hooks";
-
-import { StatusBadge } from "@/components";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router";
+import { setDriverAvailability } from "@/api";
+import { useDriver, useDriverAnalytics } from "@/features/drivers/hooks";
+import { useDeliveries } from "@/features/deliveries/hooks";
+import { refreshOperations } from "@/lib/queries";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Panel, Notice, Loading, Avatar, EmptyState } from "@/components/UI";
+import { dateTime, shortId } from "@/lib/format";
 import { DriverAnalyticsCard } from "./DriverAnalyticsCard";
-
-interface DriverDetailsProps {
-  driverId: string;
-}
-
-export function DriverDetails({
-  driverId,
-}: DriverDetailsProps) {
+export function DriverDetails({ driverId }: { driverId: string }) {
   const driver = useDriver(driverId);
   const analytics = useDriverAnalytics(driverId);
-
-  if (driver.isLoading) {
+  const deliveries = useDeliveries();
+  const client = useQueryClient();
+  const [feedback, setFeedback] = useState("");
+  const availability = useMutation({
+    mutationFn: (available: boolean) =>
+      setDriverAvailability(driverId, { available }),
+    onSuccess: async (result, requested) => {
+      setFeedback(
+        requested && result.availability !== "AVAILABLE"
+          ? "Availability preference saved. This driver remains unavailable while assigned."
+          : "Availability updated.",
+      );
+      await refreshOperations(client);
+    },
+  });
+  if (driver.isPending) return <Loading label="Loading driver…" />;
+  if (!driver.data)
     return (
-      <div className="text-sm text-zinc-500">
-        Loading driver...
-      </div>
+      <Notice tone="error">
+        {driver.error?.message ?? "Driver unavailable"}
+      </Notice>
     );
-  }
-
-  if (driver.isError || !driver.data) {
-    return (
-      <div className="rounded-xl border border-red-900 bg-red-950/30 p-6 text-red-300">
-        Failed to load driver.
-      </div>
-    );
-  }
-
+  const history = [...(deliveries.data ?? [])]
+    .filter((d) => d.driverId === driverId)
+    .sort((a, b) => (b.assignedAt ?? "").localeCompare(a.assignedAt ?? ""))
+    .slice(0, 6);
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-zinc-500">
-              Driver
-            </p>
-
-            <h1 className="mt-1 text-xl font-semibold text-zinc-100">
-              {driver.data.name}
-            </h1>
-
-            <p className="mt-2 font-mono text-xs text-zinc-500">
-              {driver.data.id}
-            </p>
+    <div className="stack">
+      <Panel>
+        <div className="panel-body">
+          <div className="flex items-center justify-between gap-4">
+            <div className="person-cell">
+              <Avatar name={driver.data.name} />
+              <div>
+                <h2 style={{ fontSize: 18 }}>{driver.data.name}</h2>
+                <span className="cell-secondary mono">{driverId}</span>
+              </div>
+            </div>
+            <StatusBadge status={driver.data.availability} />
           </div>
-
-          <StatusBadge
-            status={driver.data.availability}
-          />
+          <div className="flex gap-2 mt-5">
+            <button
+              className="button button-small"
+              disabled={availability.isPending}
+              onClick={() => availability.mutate(true)}
+            >
+              Mark available
+            </button>
+            <button
+              className="button button-ghost button-small"
+              disabled={availability.isPending}
+              onClick={() => availability.mutate(false)}
+            >
+              Mark unavailable
+            </button>
+          </div>
+          {feedback && (
+            <p className="text-xs muted mt-3" role="status">
+              {feedback}
+            </p>
+          )}
+          {availability.isError && (
+            <div className="mt-3">
+              <Notice tone="error">{availability.error.message}</Notice>
+            </div>
+          )}
         </div>
-      </div>
-
-      {analytics.isLoading && (
-        <div className="text-sm text-zinc-500">
-          Loading performance data...
-        </div>
-      )}
-
+      </Panel>
       {analytics.isError && (
-        <div className="rounded-xl border border-red-900 bg-red-950/30 p-5 text-sm text-red-300">
-          Failed to load driver analytics.
-        </div>
+        <Notice tone="warning">
+          Driver performance is temporarily unavailable.
+        </Notice>
       )}
-
-      {analytics.data && (
-        <DriverAnalyticsCard
-          analytics={analytics.data}
-        />
-      )}
+      {analytics.data ? (
+        <DriverAnalyticsCard analytics={analytics.data} />
+      ) : analytics.isPending ? (
+        <Loading label="Loading performance…" />
+      ) : null}
+      <Panel
+        title="Recent assignments"
+        subtitle="Latest recorded delivery assignments"
+      >
+        {deliveries.isError ? (
+          <div className="panel-body">
+            <Notice tone="warning">Assignment history is unavailable.</Notice>
+          </div>
+        ) : history.length ? (
+          <div className="table-scroll">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Delivery</th>
+                  <th>State</th>
+                  <th>Assigned</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((d) => (
+                  <tr key={d.deliveryId}>
+                    <td>
+                      <Link className="mono" to={`/deliveries/${d.deliveryId}`}>
+                        #{shortId(d.deliveryId)}
+                      </Link>
+                    </td>
+                    <td>
+                      <StatusBadge status={d.status} />
+                    </td>
+                    <td>{dateTime(d.assignedAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState
+            title="No assignments yet"
+            description="Recorded assignments will appear here."
+            icon="dispatch"
+          />
+        )}
+      </Panel>
     </div>
   );
 }

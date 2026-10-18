@@ -5,6 +5,6 @@ export function useAvailableDrivers() {
   return useQuery({
     queryKey: ["fleet", "drivers", "available"],
     queryFn: getAvailableDrivers,
-    refetchInterval: 2000,
+    refetchInterval: 5000,
   });
 }
