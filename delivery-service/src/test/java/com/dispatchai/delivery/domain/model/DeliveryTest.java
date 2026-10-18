@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.dispatchai.delivery.domain.model.exceptions.InvalidDeliveryStateException;
+import com.dispatchai.delivery.domain.exception.InvalidDeliveryStateException;
 
 class DeliveryTest {
   private Delivery createDelivery() {

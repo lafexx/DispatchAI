@@ -22,14 +22,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.dispatchai.delivery.domain.model.CancellationReason;
 import com.dispatchai.delivery.domain.model.Delivery;
 import com.dispatchai.delivery.domain.model.DeliveryStatus;
-import com.dispatchai.delivery.domain.model.exceptions.DeliveryNotFoundException;
-import com.dispatchai.delivery.infrastructure.messaging.DeliveryEventPublisher;
-import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCancelledEvent;
-import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCompletedEvent;
-import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryCreatedEvent;
-import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryDelayedEvent;
-import com.dispatchai.delivery.infrastructure.messaging.events.DeliveryStartedEvent;
-import com.dispatchai.delivery.infrastructure.persistence.DeliveryJpaRepository;
+import com.dispatchai.delivery.domain.exception.DeliveryNotFoundException;
+import com.dispatchai.delivery.infrastructure.messaging.publisher.DeliveryEventPublisher;
+import com.dispatchai.delivery.infrastructure.messaging.event.DeliveryCancelledEvent;
+import com.dispatchai.delivery.infrastructure.messaging.event.DeliveryCompletedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.event.DeliveryCreatedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.event.DeliveryDelayedEvent;
+import com.dispatchai.delivery.infrastructure.messaging.event.DeliveryStartedEvent;
+import com.dispatchai.delivery.infrastructure.persistence.repository.DeliveryJpaRepository;
 import com.dispatchai.delivery.presentation.dto.CancelDeliveryRequest;
 import com.dispatchai.delivery.presentation.dto.CreateDeliveryRequest;
 
@@ -41,6 +41,9 @@ class DeliveryApplicationServiceTest {
 
   @Mock
   private DeliveryEventPublisher eventPublisher;
+
+  @Mock
+  private com.dispatchai.delivery.infrastructure.client.fleet.FleetReservationClient reservations;
 
   @InjectMocks
   private DeliveryApplicationService service;
@@ -59,7 +62,7 @@ class DeliveryApplicationServiceTest {
     assertEquals(customerId, result.customerId());
     assertEquals("Sydney", result.pickupAddress());
     assertEquals("Wollongong", result.destinationAddress());
-    assertEquals(DeliveryStatus.PENDING.name(), result.status());
+    assertEquals(DeliveryStatus.PENDING, result.status());
 
     verify(repository).save(any(Delivery.class));
     verify(eventPublisher).publish(any(DeliveryCreatedEvent.class));
@@ -108,7 +111,7 @@ class DeliveryApplicationServiceTest {
 
     assertEquals(id, result.id());
     assertEquals(customerId, result.customerId());
-    assertEquals(DeliveryStatus.PENDING.name(), result.status());
+    assertEquals(DeliveryStatus.PENDING, result.status());
   }
 
   @Test
@@ -134,12 +137,12 @@ class DeliveryApplicationServiceTest {
         "Sydney",
         "Wollongong");
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     var result = service.assign(id, driverId);
 
-    assertEquals(DeliveryStatus.ASSIGNED.name(), result.status());
+    assertEquals(DeliveryStatus.ASSIGNED, result.status());
     assertEquals(driverId, result.assignedDriverId());
 
     verify(repository).save(delivery);
@@ -155,7 +158,7 @@ class DeliveryApplicationServiceTest {
         "Sydney",
         "Wollongong");
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     service.assign(id, UUID.randomUUID());
@@ -182,7 +185,7 @@ class DeliveryApplicationServiceTest {
 
     delivery.assign(UUID.randomUUID());
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     var result = service.start(id);
@@ -211,7 +214,7 @@ class DeliveryApplicationServiceTest {
 
     delivery.assign(driverId);
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     service.start(id);
@@ -235,13 +238,13 @@ class DeliveryApplicationServiceTest {
 
     var delivery = createInTransitDelivery(id);
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     var result = service.complete(id);
 
     assertEquals(
-        DeliveryStatus.COMPLETED.name(),
+        DeliveryStatus.COMPLETED,
         result.status());
 
     verify(repository).save(delivery);
@@ -264,7 +267,7 @@ class DeliveryApplicationServiceTest {
     delivery.assign(driverId);
     delivery.start();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     service.complete(id);
@@ -292,7 +295,7 @@ class DeliveryApplicationServiceTest {
         "Sydney",
         "Wollongong");
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     var request = new CancelDeliveryRequest(
@@ -302,7 +305,7 @@ class DeliveryApplicationServiceTest {
     var result = service.cancel(id, request);
 
     assertEquals(
-        DeliveryStatus.CANCELLED.name(),
+        DeliveryStatus.CANCELLED,
         result.status());
 
     verify(repository).save(delivery);
@@ -321,7 +324,7 @@ class DeliveryApplicationServiceTest {
         "Sydney",
         "Wollongong");
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     var request = new CancelDeliveryRequest(
@@ -358,7 +361,7 @@ class DeliveryApplicationServiceTest {
 
     delivery.assign(UUID.randomUUID());
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     var result = service.delay(
@@ -389,7 +392,7 @@ class DeliveryApplicationServiceTest {
 
     delivery.assign(driverId);
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.of(delivery));
 
     service.delay(
@@ -416,7 +419,7 @@ class DeliveryApplicationServiceTest {
   void operationThrowsWhenDeliveryDoesNotExist() {
     var id = UUID.randomUUID();
 
-    when(repository.findById(id))
+    when(repository.findByIdForUpdate(id))
         .thenReturn(Optional.empty());
 
     assertThrows(

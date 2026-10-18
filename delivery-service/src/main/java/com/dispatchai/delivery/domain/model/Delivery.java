@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.dispatchai.delivery.domain.model.exceptions.InvalidDeliveryStateException;
+import com.dispatchai.delivery.domain.exception.InvalidDeliveryStateException;
 
 @Entity
 @Table(name = "deliveries")
@@ -29,6 +29,12 @@ public class Delivery {
 
   @Column(nullable = true)
   private UUID assignedDriverId;
+
+  @Column(precision = 10, scale = 2)
+  private java.math.BigDecimal parcelWeightKg;
+  private UUID assignedAssignmentId;
+  private UUID assignedVehicleId;
+  private Instant assignmentAcceptedAt;
 
   @Column(nullable = true)
   private CancellationReason cancellationReason;
@@ -58,6 +64,13 @@ public class Delivery {
   }
 
   public Delivery(UUID id, UUID customerId, String pickupAddress, String destinationAddress) {
+    this(id, customerId, pickupAddress, destinationAddress, java.math.BigDecimal.ONE);
+  }
+
+  public Delivery(UUID id, UUID customerId, String pickupAddress, String destinationAddress, java.math.BigDecimal weight) {
+    if (weight == null || weight.signum() <= 0 || weight.scale() > 2 || weight.compareTo(new java.math.BigDecimal("99999999.99")) > 0)
+      throw new IllegalArgumentException("Parcel weight must be positive, at most 99999999.99 kg, with at most two decimal places");
+    this.parcelWeightKg = weight;
     this.id = id;
     this.customerId = customerId;
     this.pickupAddress = pickupAddress;
@@ -82,6 +95,49 @@ public class Delivery {
     assignedDriverId = driverId;
     status = DeliveryStatus.ASSIGNED;
     updatedAt = Instant.now();
+  }
+
+  /**
+   * Event application is tolerant of duplicates and terminal-before-assignment.
+   */
+  public boolean applyAssignment(UUID driverId) {
+    if (driverId == null) {
+      throw new IllegalArgumentException("Driver ID cannot be null");
+    }
+    if (status == DeliveryStatus.COMPLETED || status == DeliveryStatus.CANCELLED) {
+      return false;
+    }
+    if (status == DeliveryStatus.PENDING) {
+      assign(driverId);
+      return true;
+    }
+    if (driverId.equals(assignedDriverId)) {
+      return false;
+    }
+    throw new InvalidDeliveryStateException("Delivery already belongs to a different driver");
+  }
+
+  public boolean hasAssignment(UUID assignmentId, UUID driverId, UUID vehicleId) {
+    return assignmentId != null && assignmentId.equals(assignedAssignmentId)
+        && java.util.Objects.equals(driverId, assignedDriverId)
+        && java.util.Objects.equals(vehicleId, assignedVehicleId);
+  }
+
+  public void acceptReservedAssignment(UUID assignmentId, UUID driverId, UUID vehicleId, Instant at) {
+    java.util.Objects.requireNonNull(assignmentId);
+    java.util.Objects.requireNonNull(at);
+    assign(driverId);
+    assignedAssignmentId = assignmentId;
+    assignedVehicleId = vehicleId;
+    assignmentAcceptedAt = at;
+  }
+
+  public Instant getAssignmentAcceptedAt() {
+    return assignmentAcceptedAt;
+  }
+
+  public Instant getUpdatedAt() {
+    return updatedAt;
   }
 
   public void start() {
@@ -146,6 +202,16 @@ public class Delivery {
     this.delayReason = reason;
     this.delayedAt = Instant.now();
   }
+
+  public void setParcelWeightKg(java.math.BigDecimal weight) {
+    if (status != DeliveryStatus.PENDING) throw new InvalidDeliveryStateException("Only pending deliveries can change parcel weight");
+    if (weight == null || weight.signum() <= 0 || weight.scale() > 2 || weight.compareTo(new java.math.BigDecimal("99999999.99")) > 0)
+      throw new IllegalArgumentException("Invalid parcel weight");
+    parcelWeightKg = weight;
+    updatedAt = Instant.now();
+  }
+
+  public java.math.BigDecimal getParcelWeightKg() { return parcelWeightKg; }
 
   public UUID getId() {
     return id;

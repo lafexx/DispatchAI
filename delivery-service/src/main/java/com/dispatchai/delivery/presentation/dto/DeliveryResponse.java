@@ -13,5 +13,6 @@ public record DeliveryResponse(
     UUID assignedDriverId,
     boolean delayed,
     Integer delayMinutes,
-    String delayReason) {
+    String delayReason,
+    java.math.BigDecimal parcelWeightKg) {
 }
