@@ -1,23 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createDelivery } from "@/api";
-import type { CreateDeliveryRequest } from "@/api";
-
+import { createDelivery, type CreateDeliveryRequest } from "@/api";
+import { refreshOperations } from "@/lib/queries";
 export function useCreateDelivery() {
-  const queryClient = useQueryClient();
-
+  const client = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateDeliveryRequest) =>
-      createDelivery(input),
-
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "deliveries"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "summary"],
-        }),
-      ]);
-    },
+    mutationFn: (input: CreateDeliveryRequest) => createDelivery(input),
+    onSuccess: () => refreshOperations(client),
   });
 }

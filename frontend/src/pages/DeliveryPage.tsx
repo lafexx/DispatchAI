@@ -10,7 +10,5 @@ export function DeliveryPage() {
     return null;
   }
 
-  return (
-    <DeliveryDetails deliveryId={deliveryId} />
-  );
+  return <DeliveryDetails deliveryId={deliveryId} />;
 }

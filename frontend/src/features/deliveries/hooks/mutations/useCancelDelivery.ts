@@ -1,34 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cancelDelivery } from "@/api";
-import type { CancelDeliveryRequest } from "@/api";
-
-interface CancelDeliveryVariables {
-  deliveryId: string;
-  input: CancelDeliveryRequest;
-}
-
+import { cancelDelivery, type CancelDeliveryRequest } from "@/api";
+import { refreshOperations } from "@/lib/queries";
 export function useCancelDelivery() {
-  const queryClient = useQueryClient();
-
+  const client = useQueryClient();
   return useMutation({
     mutationFn: ({
       deliveryId,
       input,
-    }: CancelDeliveryVariables) =>
-      cancelDelivery(deliveryId, input),
-
-    onSuccess: async (_, { deliveryId }) => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "deliveries"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "deliveries", deliveryId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "summary"],
-        }),
-      ]);
-    },
+    }: {
+      deliveryId: string;
+      input: CancelDeliveryRequest;
+    }) => cancelDelivery(deliveryId, input),
+    onSuccess: () => refreshOperations(client),
   });
 }

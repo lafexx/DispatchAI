@@ -1,34 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { delayDelivery } from "@/api";
-import type { DelayDeliveryRequest } from "@/api";
-
-interface DelayDeliveryVariables {
-  deliveryId: string;
-  input: DelayDeliveryRequest;
-}
-
+import { delayDelivery, type DelayDeliveryRequest } from "@/api";
+import { refreshOperations } from "@/lib/queries";
 export function useDelayDelivery() {
-  const queryClient = useQueryClient();
-
+  const client = useQueryClient();
   return useMutation({
     mutationFn: ({
       deliveryId,
       input,
-    }: DelayDeliveryVariables) =>
-      delayDelivery(deliveryId, input),
-
-    onSuccess: async (_, { deliveryId }) => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "deliveries"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "deliveries", deliveryId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["analytics", "summary"],
-        }),
-      ]);
-    },
+    }: {
+      deliveryId: string;
+      input: DelayDeliveryRequest;
+    }) => delayDelivery(deliveryId, input),
+    onSuccess: () => refreshOperations(client),
   });
 }

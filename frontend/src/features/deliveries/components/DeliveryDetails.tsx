@@ -1,168 +1,252 @@
-import { StatusBadge } from "@/components";
-
-import {
-  useDelivery,
-} from "@/features/deliveries/hooks";
-
+import { Link } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getDeliveryAssignment } from "@/api";
+import { useDelivery } from "@/features/deliveries/hooks";
+import { useDrivers } from "@/features/drivers/hooks";
+import { useSourceDelivery, useCustomers, useVehicles } from "@/lib/queries";
+import { Panel, Notice, Loading, PageHeader } from "@/components/UI";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Icon } from "@/components/Icon";
 import { DeliveryActions } from "./DeliveryActions";
-import { DispatchPanel } from "@/features/dispatch/components";
-
-interface DeliveryDetailsProps {
-  deliveryId: string;
-}
-
-function formatDate(value: string | null) {
-  if (!value) {
-    return "—";
-  }
-
-  return new Date(value).toLocaleString();
-}
-
-export function DeliveryDetails({
-  deliveryId,
-}: DeliveryDetailsProps) {
-  const delivery = useDelivery(deliveryId);
-
-  if (delivery.isLoading) {
+import { DispatchPanel } from "@/features/dispatch/components/DispatchPanel";
+import { dateTime, shortId } from "@/lib/format";
+export function DeliveryDetails({ deliveryId }: { deliveryId: string }) {
+  const source = useSourceDelivery(deliveryId);
+  const projection = useDelivery(deliveryId);
+  const drivers = useDrivers();
+  const customers = useCustomers();
+  const vehicles = useVehicles();
+  const assignment = useQuery({
+    queryKey: ["dispatch", "delivery-assignment", deliveryId],
+    queryFn: () => getDeliveryAssignment(deliveryId),
+    enabled: !!source.data?.assignedDriverId,
+    refetchInterval: 5000,
+  });
+  if (source.isPending) return <Loading label="Loading delivery details…" />;
+  if (!source.data)
     return (
-      <div className="text-sm text-zinc-500">
-        Loading delivery...
-      </div>
+      <Notice tone="error">
+        {source.error?.message ?? "Delivery not found"}{" "}
+        <Link className="link-button ml-3" to="/deliveries">
+          Back to deliveries
+        </Link>
+      </Notice>
     );
-  }
-
-  if (delivery.isError || !delivery.data) {
-    return (
-      <div className="rounded-xl border border-red-900 bg-red-950/30 p-6 text-red-300">
-        Failed to load delivery.
-      </div>
-    );
-  }
-
-  const data = delivery.data;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm text-zinc-500">
-          Delivery details
-        </p>
-
-        <h1 className="mt-1 font-mono text-xl font-semibold text-zinc-100">
-          {data.deliveryId}
-        </h1>
-      </div>
-
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-zinc-500">
-              Current status
-            </p>
-
-            <div className="mt-2">
-              <StatusBadge status={data.status} />
-            </div>
-          </div>
-        </div>
-
-        <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Detail
-            label="Driver"
-            value={data.driverId ?? "Unassigned"}
-            mono
-          />
-
-          <Detail
-            label="Delayed"
-            value={data.delayed ? "Yes" : "No"}
-          />
-
-          <Detail
-            label="Delay"
-            value={
-              data.delayMinutes != null
-                ? `${data.delayMinutes} minutes`
-                : "—"
-            }
-          />
-
-          <Detail
-            label="Delay reason"
-            value={data.delayReason ?? "—"}
-          />
-
-          <Detail
-            label="Created"
-            value={formatDate(data.createdAt)}
-          />
-
-          <Detail
-            label="Assigned"
-            value={formatDate(data.assignedAt)}
-          />
-
-          <Detail
-            label="Started"
-            value={formatDate(data.startedAt)}
-          />
-
-          <Detail
-            label="Completed"
-            value={formatDate(data.completedAt)}
-          />
-        </dl>
-      </div>
-
-      {data.status === "PENDING" ? (
-        <DispatchPanel
-          deliveryId={deliveryId}
-        />
-      ) : (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-          <h2 className="font-semibold text-zinc-100">
-            Delivery actions
-          </h2>
-
-          <div className="mt-4">
-            <DeliveryActions
-              deliveryId={deliveryId}
-              status={data.status}
-              delayed={data.delayed}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+  const d = source.data;
+  const p = projection.data;
+  const driver = drivers.data?.find((x) => x.id === d.assignedDriverId);
+  const customer = customers.data?.find((x) => x.id === d.customerId);
+  const vehicle = vehicles.data?.find(
+    (x) => x.id === assignment.data?.vehicleId,
   );
-}
-
-interface DetailProps {
-  label: string;
-  value: string;
-  mono?: boolean;
-}
-
-function Detail({
-  label,
-  value,
-  mono,
-}: DetailProps) {
+  const stage = ["PENDING", "ASSIGNED", "IN_TRANSIT", "COMPLETED"].indexOf(
+    d.status,
+  );
+  const timeline = [
+    { label: "Delivery created", at: p?.createdAt, done: true },
+    {
+      label: "Driver assigned",
+      at: p?.assignedAt,
+      done: stage >= 1 || !!p?.assignedAt,
+    },
+    {
+      label: "In transit",
+      at: p?.startedAt,
+      done: stage >= 2 || !!p?.startedAt,
+    },
+    ...(d.status === "CANCELLED"
+      ? [{ label: "Cancelled", at: p?.cancelledAt, done: true }]
+      : [
+          {
+            label: "Delivery completed",
+            at: p?.completedAt,
+            done: d.status === "COMPLETED",
+          },
+        ]),
+  ];
   return (
-    <div>
-      <dt className="text-xs uppercase tracking-wide text-zinc-500">
-        {label}
-      </dt>
-
-      <dd
-        className={[
-          "mt-1 break-all text-sm text-zinc-200",
-          mono ? "font-mono" : "",
-        ].join(" ")}
-      >
-        {value}
-      </dd>
+    <div className="stack">
+      <PageHeader
+        eyebrow="DELIVERY DETAILS"
+        title={`Delivery #${shortId(deliveryId)}`}
+        description={
+          customer
+            ? `${customer.name} · ${customer.email}`
+            : `Customer #${shortId(d.customerId)}`
+        }
+        actions={
+          <>
+            <StatusBadge status={d.status} />
+            <Link to="/deliveries" className="button button-ghost">
+              <Icon name="back" size={14} />
+              All deliveries
+            </Link>
+          </>
+        }
+      />
+      {source.isError && (
+        <Notice tone="warning">
+          Delivery state could not be refreshed. Displaying the last fetched
+          details.
+        </Notice>
+      )}
+      {projection.isError && (
+        <Notice tone="info">
+          Delivery details are available. Timeline statistics are still loading
+          or temporarily unavailable.
+        </Notice>
+      )}
+      <div className="detail-grid">
+        <div className="stack">
+          <Panel
+            title="Route & parcel"
+            subtitle="Pickup, destination and delivery requirements"
+          >
+            <div className="panel-body-topless">
+              <div className="route-address">
+                <span className="route-marker">A</span>
+                <div>
+                  <label>Pickup address</label>
+                  <strong>{d.pickupAddress}</strong>
+                </div>
+              </div>
+              <div className="route-address destination">
+                <span className="route-marker">B</span>
+                <div>
+                  <label>Destination address</label>
+                  <strong>{d.destinationAddress}</strong>
+                </div>
+              </div>
+              <div className="stat-row mt-3">
+                <span>Parcel weight</span>
+                <strong>
+                  {d.parcelWeightKg == null
+                    ? "Weight required"
+                    : `${d.parcelWeightKg} kg`}
+                </strong>
+              </div>
+              <div className="stat-row">
+                <span>Driver</span>
+                <strong>
+                  {driver ? (
+                    <Link
+                      className="text-blue"
+                      to={`/fleet?driver=${driver.id}`}
+                    >
+                      {driver.name}
+                    </Link>
+                  ) : d.assignedDriverId ? (
+                    shortId(d.assignedDriverId)
+                  ) : (
+                    "Unassigned"
+                  )}
+                </strong>
+              </div>
+              <div className="stat-row">
+                <span>Vehicle</span>
+                <strong>
+                  {vehicle
+                    ? `${vehicle.registration} · ${vehicle.capacityKg} kg capacity`
+                    : assignment.data?.vehicleId
+                      ? shortId(assignment.data.vehicleId)
+                      : "Unassigned"}
+                </strong>
+              </div>
+              {assignment.isError && (
+                <p className="text-xs muted mt-3">
+                  Assignment details are temporarily unavailable.
+                </p>
+              )}
+              <div className="stat-row">
+                <span>Delivery ID</span>
+                <strong
+                  className="mono"
+                  style={{ overflowWrap: "anywhere", maxWidth: "70%" }}
+                >
+                  {deliveryId}
+                </strong>
+              </div>
+            </div>
+          </Panel>
+          {d.delayed && (
+            <Panel
+              title="Reported delay"
+              action={
+                <span className="status-badge status-pending">
+                  <Icon name="clock" size={12} />
+                  {d.delayMinutes ?? "—"} min
+                </span>
+              }
+            >
+              <div className="panel-body-topless">
+                <p className="text-sm text-zinc-300 leading-7">
+                  {d.delayReason ?? "No reason recorded"}
+                </p>
+                <p className="text-xs muted mt-3">
+                  Latest report {dateTime(p?.lastDelayAt)}
+                </p>
+              </div>
+            </Panel>
+          )}
+          {d.status === "PENDING" && <DispatchPanel deliveryId={deliveryId} />}
+          <Panel title="Delivery actions">
+            <div className="panel-body-topless">
+              <DeliveryActions
+                deliveryId={deliveryId}
+                status={d.status}
+                delayed={d.delayed}
+              />
+              {["COMPLETED", "CANCELLED"].includes(d.status) && (
+                <p className="text-xs muted">
+                  This delivery has finished. No further lifecycle actions are
+                  available.
+                </p>
+              )}
+            </div>
+          </Panel>
+        </div>
+        <Panel
+          title="Delivery timeline"
+          subtitle="Milestones recorded for this delivery"
+        >
+          <div className="timeline">
+            {timeline.map((item) => (
+              <div
+                key={item.label}
+                className={`timeline-item ${item.done ? "done" : ""} ${item.label === "Cancelled" ? "cancelled" : ""}`}
+              >
+                <span className="timeline-step">
+                  {item.done ? (
+                    <Icon
+                      name={item.label === "Cancelled" ? "close" : "check"}
+                      size={11}
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        width: 4,
+                        height: 4,
+                        background: "currentColor",
+                        borderRadius: 4,
+                      }}
+                    />
+                  )}
+                </span>
+                <div>
+                  <h3>{item.label}</h3>
+                  <p>
+                    {item.at
+                      ? dateTime(item.at)
+                      : item.done
+                        ? "Timestamp updating…"
+                        : "Not reached"}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      </div>
     </div>
   );
 }

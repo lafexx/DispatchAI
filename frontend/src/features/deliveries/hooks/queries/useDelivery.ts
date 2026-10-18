@@ -6,6 +6,6 @@ export function useDelivery(deliveryId?: string) {
     queryKey: ["analytics", "deliveries", deliveryId],
     queryFn: () => getDeliveryAnalytics(deliveryId!),
     enabled: Boolean(deliveryId),
-    refetchInterval: 2000,
+    refetchInterval: 5000,
   });
 }

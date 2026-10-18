@@ -5,6 +5,6 @@ export function useDeliveries() {
   return useQuery({
     queryKey: ["analytics", "deliveries"],
     queryFn: getDeliveries,
-    refetchInterval: 2000,
+    refetchInterval: 5000,
   });
 }

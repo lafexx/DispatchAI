@@ -1,119 +1,87 @@
 import { useState } from "react";
-
 import {
   useCompleteDelivery,
   useStartDelivery,
 } from "@/features/deliveries/hooks";
-
 import type { AnalyticsDeliveryStatus } from "@/api";
-
 import { CancelDeliveryDialog } from "./CancelDeliveryDialog";
 import { DelayDeliveryDialog } from "./DelayDeliveryDialog";
-
-interface DeliveryActionsProps {
-  deliveryId: string;
-  status: AnalyticsDeliveryStatus;
-  delayed: boolean;
-}
-
+import { Notice } from "@/components/UI";
+import { Icon } from "@/components/Icon";
 export function DeliveryActions({
   deliveryId,
   status,
   delayed,
-}: DeliveryActionsProps) {
-  const [delayDialogOpen, setDelayDialogOpen] =
-    useState(false);
-
-  const [cancelDialogOpen, setCancelDialogOpen] =
-    useState(false);
-
-  const startDelivery = useStartDelivery();
-  const completeDelivery = useCompleteDelivery();
-
-  const active =
-    status === "PENDING" ||
-    status === "ASSIGNED" ||
-    status === "IN_TRANSIT";
-
+}: {
+  deliveryId: string;
+  status: AnalyticsDeliveryStatus;
+  delayed: boolean;
+}) {
+  const [delayOpen, setDelayOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const start = useStartDelivery();
+  const complete = useCompleteDelivery();
+  const active = ["PENDING", "ASSIGNED", "IN_TRANSIT"].includes(status);
+  const busy = start.isPending || complete.isPending;
   return (
     <>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {status === "ASSIGNED" && (
           <button
-            type="button"
-            onClick={() =>
-              startDelivery.mutate(deliveryId)
-            }
-            disabled={startDelivery.isPending}
-            className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-white disabled:opacity-50"
+            className="button button-primary"
+            disabled={busy}
+            onClick={() => start.mutate(deliveryId)}
           >
-            {startDelivery.isPending
-              ? "Starting..."
-              : "Start delivery"}
+            <Icon name="truck" size={15} />
+            {start.isPending ? "Starting…" : "Start delivery"}
           </button>
         )}
-
         {status === "IN_TRANSIT" && (
           <button
-            type="button"
-            onClick={() =>
-              completeDelivery.mutate(deliveryId)
-            }
-            disabled={completeDelivery.isPending}
-            className="rounded-lg bg-emerald-400 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-emerald-300 disabled:opacity-50"
+            className="button button-primary"
+            disabled={busy}
+            onClick={() => complete.mutate(deliveryId)}
           >
-            {completeDelivery.isPending
-              ? "Completing..."
-              : "Complete delivery"}
+            <Icon name="check" size={15} />
+            {complete.isPending ? "Completing…" : "Complete delivery"}
           </button>
         )}
-
         {active && !delayed && (
           <button
-            type="button"
-            onClick={() =>
-              setDelayDialogOpen(true)
-            }
-            className="rounded-lg border border-amber-800 bg-amber-950/40 px-4 py-2 text-sm font-medium text-amber-300 hover:bg-amber-950"
+            className="button"
+            disabled={busy}
+            onClick={() => setDelayOpen(true)}
           >
-            Mark delayed
+            <Icon name="clock" size={15} />
+            Report delay
           </button>
         )}
-
         {active && (
           <button
-            type="button"
-            onClick={() =>
-              setCancelDialogOpen(true)
-            }
-            className="rounded-lg border border-red-900 bg-red-950/30 px-4 py-2 text-sm font-medium text-red-300 hover:bg-red-950/60"
+            className="button button-danger"
+            disabled={busy}
+            onClick={() => setCancelOpen(true)}
           >
             Cancel delivery
           </button>
         )}
       </div>
-
-      {(startDelivery.isError ||
-        completeDelivery.isError) && (
-          <p className="mt-3 text-sm text-red-400">
-            Delivery operation failed.
-          </p>
-        )}
-
+      {(start.isError || complete.isError) && (
+        <div className="mt-3">
+          <Notice tone="error">
+            {start.error?.message ?? complete.error?.message}
+          </Notice>
+        </div>
+      )}
       <DelayDeliveryDialog
         deliveryId={deliveryId}
-        open={delayDialogOpen}
-        onClose={() =>
-          setDelayDialogOpen(false)
-        }
+        open={delayOpen}
+        onClose={() => setDelayOpen(false)}
       />
-
       <CancelDeliveryDialog
         deliveryId={deliveryId}
-        open={cancelDialogOpen}
-        onClose={() =>
-          setCancelDialogOpen(false)
-        }
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
       />
     </>
   );

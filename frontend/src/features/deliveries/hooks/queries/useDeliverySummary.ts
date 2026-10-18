@@ -5,6 +5,6 @@ export function useDeliverySummary() {
   return useQuery({
     queryKey: ["analytics", "summary"],
     queryFn: getDeliverySummary,
-    refetchInterval: 2000,
+    refetchInterval: 5000,
   });
 }
