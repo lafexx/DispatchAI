@@ -1,4 +1,4 @@
-package com.dispatchai.delivery.presentation;
+package com.dispatchai.dispatch.presentation.error;
 
 import java.time.Instant;
 

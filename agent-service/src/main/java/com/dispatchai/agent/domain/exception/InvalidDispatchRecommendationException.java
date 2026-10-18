@@ -1,4 +1,4 @@
-package com.dispatchai.agent.domain.exceptions;
+package com.dispatchai.agent.domain.exception;
 
 public class InvalidDispatchRecommendationException extends RuntimeException {
   public InvalidDispatchRecommendationException(String message) {

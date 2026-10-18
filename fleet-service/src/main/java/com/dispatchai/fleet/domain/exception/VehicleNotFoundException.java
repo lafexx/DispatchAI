@@ -1,4 +1,4 @@
-package com.dispatchai.fleet.domain.model.exceptions;
+package com.dispatchai.fleet.domain.exception;
 
 import java.util.UUID;
 

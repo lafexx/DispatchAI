@@ -1,4 +1,4 @@
-package com.dispatchai.customer.domain.exceptions;
+package com.dispatchai.customer.domain.exception;
 
 import java.util.UUID;
 

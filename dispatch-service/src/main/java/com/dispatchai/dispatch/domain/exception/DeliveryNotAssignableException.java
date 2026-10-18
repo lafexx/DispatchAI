@@ -1,4 +1,4 @@
-package com.dispatchai.dispatch.domain.model.exceptions;
+package com.dispatchai.dispatch.domain.exception;
 
 public class DeliveryNotAssignableException
     extends RuntimeException {
