@@ -1,4 +1,4 @@
-package com.dispatchai.agent.application;
+package com.dispatchai.agent.infrastructure.ai.agent;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.spring.AiService;
