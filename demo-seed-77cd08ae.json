@@ -1,0 +1,3064 @@
+{
+  "version": 1,
+  "runId": "77cd08ae",
+  "startedAt": "2026-10-19T03:42:13.394003+00:00",
+  "urls": {
+    "delivery": "http://localhost:8081",
+    "fleet": "http://localhost:8082",
+    "dispatch": "http://localhost:8083",
+    "customer": "http://localhost:8084",
+    "analytics": "http://localhost:8085"
+  },
+  "complete": true,
+  "customers": [
+    {
+      "id": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "name": "Apex Distribution \u00b7 Demo 77cd08ae-1",
+      "email": "demo-77cd08ae-1@example.com",
+      "phone": "0400000000"
+    },
+    {
+      "id": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "name": "Harbour Supply \u00b7 Demo 77cd08ae-2",
+      "email": "demo-77cd08ae-2@example.com",
+      "phone": "0400000000"
+    },
+    {
+      "id": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "name": "Metro Retail \u00b7 Demo 77cd08ae-3",
+      "email": "demo-77cd08ae-3@example.com",
+      "phone": "0400000000"
+    },
+    {
+      "id": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "name": "Eastside Foods \u00b7 Demo 77cd08ae-4",
+      "email": "demo-77cd08ae-4@example.com",
+      "phone": "0400000000"
+    }
+  ],
+  "drivers": [
+    {
+      "id": "03763e36-4e5a-45f5-811d-60039d796bb6",
+      "name": "Alex Morgan \u00b7 Demo 77cd08ae-1",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+      "name": "Jamie Chen \u00b7 Demo 77cd08ae-2",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+      "name": "Sam Wilson \u00b7 Demo 77cd08ae-3",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+      "name": "Taylor Reed \u00b7 Demo 77cd08ae-4",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "2681ec6d-db3b-4141-b623-9f47e2357249",
+      "name": "Jordan Lee \u00b7 Demo 77cd08ae-5",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "bb2546b1-fae2-4826-890d-7af4361e2756",
+      "name": "Casey Patel \u00b7 Demo 77cd08ae-6",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+      "name": "Riley Davis \u00b7 Demo 77cd08ae-7",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+      "name": "Avery Smith \u00b7 Demo 77cd08ae-8",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "084bda1c-09f9-4315-8231-44910fec1e32",
+      "name": "Morgan Evans \u00b7 Demo 77cd08ae-9",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "38a16656-3d99-4317-9ddc-8179d47592ac",
+      "name": "Drew Nguyen \u00b7 Demo 77cd08ae-10",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+      "name": "Alex Morgan \u00b7 Demo 77cd08ae-11",
+      "availability": "AVAILABLE"
+    },
+    {
+      "id": "31c7e110-9fc4-4189-a008-647d717335a9",
+      "name": "Jamie Chen \u00b7 Demo 77cd08ae-12",
+      "availability": "AVAILABLE"
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "392f40cf-948b-4bda-98c2-2fe65ff3fc56",
+      "registration": "DEMO-77CD08AE-01",
+      "type": "TRUCK",
+      "capacityKg": 1500.0,
+      "available": true
+    },
+    {
+      "id": "58ae866c-f15e-4878-ae42-135384a80d90",
+      "registration": "DEMO-77CD08AE-02",
+      "type": "VAN",
+      "capacityKg": 500.0,
+      "available": true
+    },
+    {
+      "id": "6955f779-1348-4953-ad9d-66059ca0ae81",
+      "registration": "DEMO-77CD08AE-03",
+      "type": "CAR",
+      "capacityKg": 100.0,
+      "available": true
+    },
+    {
+      "id": "6b3abe2e-5131-4541-8dbc-6c3b23edc05e",
+      "registration": "DEMO-77CD08AE-04",
+      "type": "TRUCK",
+      "capacityKg": 1500.0,
+      "available": true
+    },
+    {
+      "id": "8d944842-0b95-4e21-8685-5e088b72407f",
+      "registration": "DEMO-77CD08AE-05",
+      "type": "VAN",
+      "capacityKg": 500.0,
+      "available": true
+    },
+    {
+      "id": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "registration": "DEMO-77CD08AE-06",
+      "type": "CAR",
+      "capacityKg": 100.0,
+      "available": true
+    },
+    {
+      "id": "43dde96a-065f-4221-a142-aaed36548239",
+      "registration": "DEMO-77CD08AE-07",
+      "type": "TRUCK",
+      "capacityKg": 1500.0,
+      "available": true
+    },
+    {
+      "id": "ea044734-e5e3-486c-961e-5c7281461d96",
+      "registration": "DEMO-77CD08AE-08",
+      "type": "VAN",
+      "capacityKg": 500.0,
+      "available": true
+    },
+    {
+      "id": "94656f26-4af5-4262-aa2b-b18b954df176",
+      "registration": "DEMO-77CD08AE-09",
+      "type": "CAR",
+      "capacityKg": 100.0,
+      "available": true
+    },
+    {
+      "id": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+      "registration": "DEMO-77CD08AE-10",
+      "type": "TRUCK",
+      "capacityKg": 1500.0,
+      "available": true
+    },
+    {
+      "id": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+      "registration": "DEMO-77CD08AE-11",
+      "type": "VAN",
+      "capacityKg": 500.0,
+      "available": true
+    },
+    {
+      "id": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb",
+      "registration": "DEMO-77CD08AE-12",
+      "type": "CAR",
+      "capacityKg": 100.0,
+      "available": true
+    }
+  ],
+  "deliveries": [
+    {
+      "id": "711055a2-a6c5-4427-a176-f26d1d727408",
+      "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "pickupAddress": "12 King Street, Sydney NSW",
+      "destinationAddress": "28 Victoria Road, Ryde NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 5.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "df061988-a1f1-41d0-9344-184063861946",
+      "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "pickupAddress": "85 George Street, Parramatta NSW",
+      "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 75.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+      "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+      "destinationAddress": "64 Church Street, Parramatta NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+      "delayed": true,
+      "delayMinutes": 25,
+      "delayReason": "Demo scenario: heavy traffic",
+      "parcelWeightKg": 250.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": true,
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+    },
+    {
+      "id": "9ba9818a-966b-4bf0-a29b-8f00a653c80d",
+      "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "pickupAddress": "28 Victoria Road, Ryde NSW",
+      "destinationAddress": "40 Railway Parade, Burwood NSW",
+      "status": "CANCELLED",
+      "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 600.0,
+      "targetStatus": "CANCELLED",
+      "expectedDelayed": false,
+      "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+    },
+    {
+      "id": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+      "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "pickupAddress": "12 King Street, Sydney NSW",
+      "destinationAddress": "28 Victoria Road, Ryde NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 5.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+      "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "pickupAddress": "85 George Street, Parramatta NSW",
+      "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 75.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+      "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+      "destinationAddress": "64 Church Street, Parramatta NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+      "delayed": true,
+      "delayMinutes": 15,
+      "delayReason": "Demo scenario: heavy traffic",
+      "parcelWeightKg": 250.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": true,
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+    },
+    {
+      "id": "5dbf705f-4c19-4a83-a584-0391bb3a335c",
+      "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "pickupAddress": "28 Victoria Road, Ryde NSW",
+      "destinationAddress": "40 Railway Parade, Burwood NSW",
+      "status": "CANCELLED",
+      "assignedDriverId": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 600.0,
+      "targetStatus": "CANCELLED",
+      "expectedDelayed": false,
+      "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+    },
+    {
+      "id": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+      "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "pickupAddress": "12 King Street, Sydney NSW",
+      "destinationAddress": "28 Victoria Road, Ryde NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 5.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+      "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "pickupAddress": "85 George Street, Parramatta NSW",
+      "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 75.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+      "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+      "destinationAddress": "64 Church Street, Parramatta NSW",
+      "status": "COMPLETED",
+      "assignedDriverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+      "delayed": true,
+      "delayMinutes": 10,
+      "delayReason": "Demo scenario: heavy traffic",
+      "parcelWeightKg": 250.0,
+      "targetStatus": "COMPLETED",
+      "expectedDelayed": true,
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+    },
+    {
+      "id": "0c4776d9-2ae0-4f68-8e2d-3a832cb6df62",
+      "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "pickupAddress": "28 Victoria Road, Ryde NSW",
+      "destinationAddress": "40 Railway Parade, Burwood NSW",
+      "status": "CANCELLED",
+      "assignedDriverId": "bb2546b1-fae2-4826-890d-7af4361e2756",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 600.0,
+      "targetStatus": "CANCELLED",
+      "expectedDelayed": false,
+      "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+    },
+    {
+      "id": "9774774b-6d42-4cf7-b785-45e8d2ba0971",
+      "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "pickupAddress": "40 Railway Parade, Burwood NSW",
+      "destinationAddress": "85 George Street, Parramatta NSW",
+      "status": "ASSIGNED",
+      "assignedDriverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 75.0,
+      "targetStatus": "ASSIGNED",
+      "expectedDelayed": false,
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+    },
+    {
+      "id": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+      "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+      "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+      "status": "IN_TRANSIT",
+      "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+      "delayed": true,
+      "delayMinutes": 15,
+      "delayReason": "Demo scenario: heavy traffic",
+      "parcelWeightKg": 250.0,
+      "targetStatus": "IN_TRANSIT",
+      "expectedDelayed": true,
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+    },
+    {
+      "id": "671b4946-6dc8-49df-93d4-bd8725993839",
+      "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "pickupAddress": "40 Railway Parade, Burwood NSW",
+      "destinationAddress": "85 George Street, Parramatta NSW",
+      "status": "ASSIGNED",
+      "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 75.0,
+      "targetStatus": "ASSIGNED",
+      "expectedDelayed": false,
+      "vehicleId": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb"
+    },
+    {
+      "id": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+      "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+      "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+      "status": "IN_TRANSIT",
+      "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+      "delayed": true,
+      "delayMinutes": 10,
+      "delayReason": "Demo scenario: heavy traffic",
+      "parcelWeightKg": 250.0,
+      "targetStatus": "IN_TRANSIT",
+      "expectedDelayed": true,
+      "vehicleId": "58ae866c-f15e-4878-ae42-135384a80d90"
+    },
+    {
+      "id": "7b6e1a4e-fbc0-4e76-92d0-1ae77577e70e",
+      "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+      "pickupAddress": "40 Railway Parade, Burwood NSW",
+      "destinationAddress": "85 George Street, Parramatta NSW",
+      "status": "ASSIGNED",
+      "assignedDriverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 75.0,
+      "targetStatus": "ASSIGNED",
+      "expectedDelayed": false,
+      "vehicleId": "6955f779-1348-4953-ad9d-66059ca0ae81"
+    },
+    {
+      "id": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+      "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+      "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+      "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+      "status": "IN_TRANSIT",
+      "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+      "delayed": true,
+      "delayMinutes": 25,
+      "delayReason": "Demo scenario: heavy traffic",
+      "parcelWeightKg": 250.0,
+      "targetStatus": "IN_TRANSIT",
+      "expectedDelayed": true,
+      "vehicleId": "8d944842-0b95-4e21-8685-5e088b72407f"
+    },
+    {
+      "id": "4c588db4-e11e-4d58-869e-77af65df7301",
+      "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+      "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+      "status": "PENDING",
+      "assignedDriverId": null,
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 25,
+      "targetStatus": "PENDING",
+      "expectedDelayed": false
+    },
+    {
+      "id": "2a848ec6-fe00-4438-ac4b-55cc52d0d8c6",
+      "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "pickupAddress": "64 Church Street, Parramatta NSW",
+      "destinationAddress": "12 King Street, Sydney NSW",
+      "status": "PENDING",
+      "assignedDriverId": null,
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 25,
+      "targetStatus": "PENDING",
+      "expectedDelayed": false
+    },
+    {
+      "id": "6bb268f5-72b7-415e-ad98-8f8465319d37",
+      "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+      "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+      "status": "PENDING",
+      "assignedDriverId": null,
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 25,
+      "targetStatus": "PENDING",
+      "expectedDelayed": false
+    },
+    {
+      "id": "7fb18c79-2c38-49ff-a809-8fb421b60e05",
+      "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "pickupAddress": "64 Church Street, Parramatta NSW",
+      "destinationAddress": "12 King Street, Sydney NSW",
+      "status": "PENDING",
+      "assignedDriverId": null,
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 25,
+      "targetStatus": "PENDING",
+      "expectedDelayed": false
+    },
+    {
+      "id": "d55c2c0f-a499-49c5-b902-2562046a3228",
+      "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+      "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+      "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+      "status": "PENDING",
+      "assignedDriverId": null,
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 25,
+      "targetStatus": "PENDING",
+      "expectedDelayed": false
+    },
+    {
+      "id": "f8e23c94-d743-45c6-8836-3f619a4f48dd",
+      "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+      "pickupAddress": "64 Church Street, Parramatta NSW",
+      "destinationAddress": "12 King Street, Sydney NSW",
+      "status": "PENDING",
+      "assignedDriverId": null,
+      "delayed": false,
+      "delayMinutes": null,
+      "delayReason": null,
+      "parcelWeightKg": 25,
+      "targetStatus": "PENDING",
+      "expectedDelayed": false
+    }
+  ],
+  "assignments": [
+    {
+      "id": "e2e043d6-869a-4a83-a2fb-054d0875c335",
+      "deliveryId": "711055a2-a6c5-4427-a176-f26d1d727408",
+      "driverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:14.211533081Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "55f12978-2911-4282-a832-9eeeab2d0062",
+      "deliveryId": "df061988-a1f1-41d0-9344-184063861946",
+      "driverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:18.839186937Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "e4b49a04-0b8d-45ac-8d2d-345c7ed784a8",
+      "deliveryId": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+      "driverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:23.946912826Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "505659c6-3d1f-4c48-b8b4-26a41c06f040",
+      "deliveryId": "9ba9818a-966b-4bf0-a29b-8f00a653c80d",
+      "driverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+      "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:29.572384241Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "17f173c8-811f-41a0-a17f-3853bef31912",
+      "deliveryId": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+      "driverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:33.669225346Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "c169e674-984d-4681-9f80-1b7a58359d8d",
+      "deliveryId": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+      "driverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:38.769168544Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "173fb57a-fd90-49bd-b8e5-57c40345396f",
+      "deliveryId": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+      "driverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:43.864245186Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "74ee189f-0387-4288-b816-847d4bed8567",
+      "deliveryId": "5dbf705f-4c19-4a83-a584-0391bb3a335c",
+      "driverId": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+      "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:49.967521380Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "70b62e80-a3d6-40d1-b208-6e1cab06bd60",
+      "deliveryId": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+      "driverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:54.053748996Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "789f9877-19f4-461e-ba5c-0d006184d877",
+      "deliveryId": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+      "driverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:42:58.643131908Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "1a6af619-531d-4b14-b735-2d975339bf9d",
+      "deliveryId": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+      "driverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:03.733094954Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "219f52fb-c2bc-4998-a33a-6e3013787dcd",
+      "deliveryId": "0c4776d9-2ae0-4f68-8e2d-3a832cb6df62",
+      "driverId": "bb2546b1-fae2-4826-890d-7af4361e2756",
+      "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:09.835241308Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "d450e1fb-381f-43ad-87a8-5d1b22de28ba",
+      "deliveryId": "9774774b-6d42-4cf7-b785-45e8d2ba0971",
+      "driverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+      "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:13.914590137Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "1b3512f7-5a2e-4973-b546-27838aa4726b",
+      "deliveryId": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+      "driverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+      "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:15.972774096Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "7822a27f-c6a4-4520-b010-6d602c48183e",
+      "deliveryId": "671b4946-6dc8-49df-93d4-bd8725993839",
+      "driverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+      "vehicleId": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:18.036231293Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "5a425494-345e-4d3b-ba23-67bc243e2f12",
+      "deliveryId": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+      "driverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+      "vehicleId": "58ae866c-f15e-4878-ae42-135384a80d90",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:20.095366384Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "e8b5cbac-1af3-4e85-a729-962cdbadd4ad",
+      "deliveryId": "7b6e1a4e-fbc0-4e76-92d0-1ae77577e70e",
+      "driverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+      "vehicleId": "6955f779-1348-4953-ad9d-66059ca0ae81",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:22.162160034Z",
+      "completedAt": null,
+      "cancelledAt": null
+    },
+    {
+      "id": "19abaa75-4a5a-42df-ad33-4af004848faa",
+      "deliveryId": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+      "driverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+      "vehicleId": "8d944842-0b95-4e21-8685-5e088b72407f",
+      "status": "ACTIVE",
+      "assignedAt": "2026-10-19T03:43:24.216267458Z",
+      "completedAt": null,
+      "cancelledAt": null
+    }
+  ],
+  "writes": [
+    {
+      "service": "customer",
+      "path": "/api/customers",
+      "body": {
+        "name": "Apex Distribution \u00b7 Demo 77cd08ae-1",
+        "email": "demo-77cd08ae-1@example.com",
+        "phone": "0400000000"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "name": "Apex Distribution \u00b7 Demo 77cd08ae-1",
+        "email": "demo-77cd08ae-1@example.com",
+        "phone": "0400000000"
+      }
+    },
+    {
+      "service": "customer",
+      "path": "/api/customers",
+      "body": {
+        "name": "Harbour Supply \u00b7 Demo 77cd08ae-2",
+        "email": "demo-77cd08ae-2@example.com",
+        "phone": "0400000000"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "name": "Harbour Supply \u00b7 Demo 77cd08ae-2",
+        "email": "demo-77cd08ae-2@example.com",
+        "phone": "0400000000"
+      }
+    },
+    {
+      "service": "customer",
+      "path": "/api/customers",
+      "body": {
+        "name": "Metro Retail \u00b7 Demo 77cd08ae-3",
+        "email": "demo-77cd08ae-3@example.com",
+        "phone": "0400000000"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "name": "Metro Retail \u00b7 Demo 77cd08ae-3",
+        "email": "demo-77cd08ae-3@example.com",
+        "phone": "0400000000"
+      }
+    },
+    {
+      "service": "customer",
+      "path": "/api/customers",
+      "body": {
+        "name": "Eastside Foods \u00b7 Demo 77cd08ae-4",
+        "email": "demo-77cd08ae-4@example.com",
+        "phone": "0400000000"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "name": "Eastside Foods \u00b7 Demo 77cd08ae-4",
+        "email": "demo-77cd08ae-4@example.com",
+        "phone": "0400000000"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Alex Morgan \u00b7 Demo 77cd08ae-1"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "name": "Alex Morgan \u00b7 Demo 77cd08ae-1",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/03763e36-4e5a-45f5-811d-60039d796bb6/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "name": "Alex Morgan \u00b7 Demo 77cd08ae-1",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Jamie Chen \u00b7 Demo 77cd08ae-2"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "name": "Jamie Chen \u00b7 Demo 77cd08ae-2",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/b3bb5d7c-85ea-44d2-abdd-a414b023a473/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "name": "Jamie Chen \u00b7 Demo 77cd08ae-2",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Sam Wilson \u00b7 Demo 77cd08ae-3"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "name": "Sam Wilson \u00b7 Demo 77cd08ae-3",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/3415f772-79c4-4733-a6e5-7ee8bc8f170b/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "name": "Sam Wilson \u00b7 Demo 77cd08ae-3",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Taylor Reed \u00b7 Demo 77cd08ae-4"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "name": "Taylor Reed \u00b7 Demo 77cd08ae-4",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/98ea3ce6-cb54-45d9-b96b-61e860352054/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "name": "Taylor Reed \u00b7 Demo 77cd08ae-4",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Jordan Lee \u00b7 Demo 77cd08ae-5"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "name": "Jordan Lee \u00b7 Demo 77cd08ae-5",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/2681ec6d-db3b-4141-b623-9f47e2357249/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "name": "Jordan Lee \u00b7 Demo 77cd08ae-5",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Casey Patel \u00b7 Demo 77cd08ae-6"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "bb2546b1-fae2-4826-890d-7af4361e2756",
+        "name": "Casey Patel \u00b7 Demo 77cd08ae-6",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/bb2546b1-fae2-4826-890d-7af4361e2756/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "bb2546b1-fae2-4826-890d-7af4361e2756",
+        "name": "Casey Patel \u00b7 Demo 77cd08ae-6",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Riley Davis \u00b7 Demo 77cd08ae-7"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "name": "Riley Davis \u00b7 Demo 77cd08ae-7",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/aca58e27-a254-4ab7-84ae-ccb80a062c32/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "name": "Riley Davis \u00b7 Demo 77cd08ae-7",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Avery Smith \u00b7 Demo 77cd08ae-8"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "name": "Avery Smith \u00b7 Demo 77cd08ae-8",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/0290ab8f-0ec1-4b40-bd6b-a84b174308ab/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "name": "Avery Smith \u00b7 Demo 77cd08ae-8",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Morgan Evans \u00b7 Demo 77cd08ae-9"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "name": "Morgan Evans \u00b7 Demo 77cd08ae-9",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/084bda1c-09f9-4315-8231-44910fec1e32/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "name": "Morgan Evans \u00b7 Demo 77cd08ae-9",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Drew Nguyen \u00b7 Demo 77cd08ae-10"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "name": "Drew Nguyen \u00b7 Demo 77cd08ae-10",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/38a16656-3d99-4317-9ddc-8179d47592ac/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "name": "Drew Nguyen \u00b7 Demo 77cd08ae-10",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Alex Morgan \u00b7 Demo 77cd08ae-11"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+        "name": "Alex Morgan \u00b7 Demo 77cd08ae-11",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/8f9b0691-98cf-4870-ac0a-a602ec71ca5d/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+        "name": "Alex Morgan \u00b7 Demo 77cd08ae-11",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers",
+      "body": {
+        "name": "Jamie Chen \u00b7 Demo 77cd08ae-12"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "name": "Jamie Chen \u00b7 Demo 77cd08ae-12",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/drivers/31c7e110-9fc4-4189-a008-647d717335a9/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "name": "Jamie Chen \u00b7 Demo 77cd08ae-12",
+        "availability": "AVAILABLE"
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-01",
+        "type": "TRUCK",
+        "capacityKg": 1500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "392f40cf-948b-4bda-98c2-2fe65ff3fc56",
+        "registration": "DEMO-77CD08AE-01",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/392f40cf-948b-4bda-98c2-2fe65ff3fc56/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "392f40cf-948b-4bda-98c2-2fe65ff3fc56",
+        "registration": "DEMO-77CD08AE-01",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-02",
+        "type": "VAN",
+        "capacityKg": 500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "58ae866c-f15e-4878-ae42-135384a80d90",
+        "registration": "DEMO-77CD08AE-02",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/58ae866c-f15e-4878-ae42-135384a80d90/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "58ae866c-f15e-4878-ae42-135384a80d90",
+        "registration": "DEMO-77CD08AE-02",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-03",
+        "type": "CAR",
+        "capacityKg": 100
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "6955f779-1348-4953-ad9d-66059ca0ae81",
+        "registration": "DEMO-77CD08AE-03",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/6955f779-1348-4953-ad9d-66059ca0ae81/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "6955f779-1348-4953-ad9d-66059ca0ae81",
+        "registration": "DEMO-77CD08AE-03",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-04",
+        "type": "TRUCK",
+        "capacityKg": 1500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "6b3abe2e-5131-4541-8dbc-6c3b23edc05e",
+        "registration": "DEMO-77CD08AE-04",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/6b3abe2e-5131-4541-8dbc-6c3b23edc05e/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "6b3abe2e-5131-4541-8dbc-6c3b23edc05e",
+        "registration": "DEMO-77CD08AE-04",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-05",
+        "type": "VAN",
+        "capacityKg": 500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "8d944842-0b95-4e21-8685-5e088b72407f",
+        "registration": "DEMO-77CD08AE-05",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/8d944842-0b95-4e21-8685-5e088b72407f/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "8d944842-0b95-4e21-8685-5e088b72407f",
+        "registration": "DEMO-77CD08AE-05",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-06",
+        "type": "CAR",
+        "capacityKg": 100
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "registration": "DEMO-77CD08AE-06",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/3d8b970b-f1e2-4535-b925-6d8dfca23c71/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "registration": "DEMO-77CD08AE-06",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-07",
+        "type": "TRUCK",
+        "capacityKg": 1500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "43dde96a-065f-4221-a142-aaed36548239",
+        "registration": "DEMO-77CD08AE-07",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/43dde96a-065f-4221-a142-aaed36548239/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "43dde96a-065f-4221-a142-aaed36548239",
+        "registration": "DEMO-77CD08AE-07",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-08",
+        "type": "VAN",
+        "capacityKg": 500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ea044734-e5e3-486c-961e-5c7281461d96",
+        "registration": "DEMO-77CD08AE-08",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/ea044734-e5e3-486c-961e-5c7281461d96/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ea044734-e5e3-486c-961e-5c7281461d96",
+        "registration": "DEMO-77CD08AE-08",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-09",
+        "type": "CAR",
+        "capacityKg": 100
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "94656f26-4af5-4262-aa2b-b18b954df176",
+        "registration": "DEMO-77CD08AE-09",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/94656f26-4af5-4262-aa2b-b18b954df176/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "94656f26-4af5-4262-aa2b-b18b954df176",
+        "registration": "DEMO-77CD08AE-09",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-10",
+        "type": "TRUCK",
+        "capacityKg": 1500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+        "registration": "DEMO-77CD08AE-10",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/0f749a4b-c6fb-41d8-a369-2a8b735b284a/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+        "registration": "DEMO-77CD08AE-10",
+        "type": "TRUCK",
+        "capacityKg": 1500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-11",
+        "type": "VAN",
+        "capacityKg": 500
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+        "registration": "DEMO-77CD08AE-11",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/3453b3d9-e6f7-4c4d-9f67-b8ce130460b0/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+        "registration": "DEMO-77CD08AE-11",
+        "type": "VAN",
+        "capacityKg": 500.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles",
+      "body": {
+        "registration": "DEMO-77CD08AE-12",
+        "type": "CAR",
+        "capacityKg": 100
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb",
+        "registration": "DEMO-77CD08AE-12",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "fleet",
+      "path": "/api/vehicles/40e0ace6-24b3-41bb-b49b-e3c3286db5eb/availability",
+      "body": {
+        "available": true
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb",
+        "registration": "DEMO-77CD08AE-12",
+        "type": "CAR",
+        "capacityKg": 100.0,
+        "available": true
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "parcelWeightKg": 5
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "711055a2-a6c5-4427-a176-f26d1d727408",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "711055a2-a6c5-4427-a176-f26d1d727408",
+        "driverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "e2e043d6-869a-4a83-a2fb-054d0875c335",
+        "deliveryId": "711055a2-a6c5-4427-a176-f26d1d727408",
+        "driverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:14.211533081Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/711055a2-a6c5-4427-a176-f26d1d727408/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "711055a2-a6c5-4427-a176-f26d1d727408",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/711055a2-a6c5-4427-a176-f26d1d727408/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "711055a2-a6c5-4427-a176-f26d1d727408",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "parcelWeightKg": 75
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "df061988-a1f1-41d0-9344-184063861946",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "df061988-a1f1-41d0-9344-184063861946",
+        "driverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "55f12978-2911-4282-a832-9eeeab2d0062",
+        "deliveryId": "df061988-a1f1-41d0-9344-184063861946",
+        "driverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:18.839186937Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/df061988-a1f1-41d0-9344-184063861946/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "df061988-a1f1-41d0-9344-184063861946",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/df061988-a1f1-41d0-9344-184063861946/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "df061988-a1f1-41d0-9344-184063861946",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "parcelWeightKg": 250
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "delayed": true,
+        "delayMinutes": 25,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": true,
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+        "driverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "e4b49a04-0b8d-45ac-8d2d-345c7ed784a8",
+        "deliveryId": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+        "driverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:23.946912826Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/a90ef415-3563-4a4b-8f9e-4642ccd2a64b/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/a90ef415-3563-4a4b-8f9e-4642ccd2a64b/delay",
+      "body": {
+        "delayMinutes": 25,
+        "reason": "Demo scenario: heavy traffic"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "delayed": true,
+        "delayMinutes": 25,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/a90ef415-3563-4a4b-8f9e-4642ccd2a64b/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "a90ef415-3563-4a4b-8f9e-4642ccd2a64b",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "delayed": true,
+        "delayMinutes": 25,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "parcelWeightKg": 600
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "9ba9818a-966b-4bf0-a29b-8f00a653c80d",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "status": "CANCELLED",
+        "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 600.0,
+        "targetStatus": "CANCELLED",
+        "expectedDelayed": false,
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "9ba9818a-966b-4bf0-a29b-8f00a653c80d",
+        "driverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "505659c6-3d1f-4c48-b8b4-26a41c06f040",
+        "deliveryId": "9ba9818a-966b-4bf0-a29b-8f00a653c80d",
+        "driverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:29.572384241Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/9ba9818a-966b-4bf0-a29b-8f00a653c80d/cancel",
+      "body": {
+        "reason": "CUSTOMER_REQUEST",
+        "notes": "Demo scenario: customer changed plans"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "9ba9818a-966b-4bf0-a29b-8f00a653c80d",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "status": "CANCELLED",
+        "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 600.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "parcelWeightKg": 5
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+        "driverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "17f173c8-811f-41a0-a17f-3853bef31912",
+        "deliveryId": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+        "driverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:33.669225346Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/5a297fc8-8521-4363-b3cf-8e6cf686e660/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/5a297fc8-8521-4363-b3cf-8e6cf686e660/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "5a297fc8-8521-4363-b3cf-8e6cf686e660",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "parcelWeightKg": 75
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+        "driverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "c169e674-984d-4681-9f80-1b7a58359d8d",
+        "deliveryId": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+        "driverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:38.769168544Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/05ac3bcf-038f-44fc-be82-31e1bea53208/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/05ac3bcf-038f-44fc-be82-31e1bea53208/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "05ac3bcf-038f-44fc-be82-31e1bea53208",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "parcelWeightKg": 250
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "delayed": true,
+        "delayMinutes": 15,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": true,
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+        "driverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "173fb57a-fd90-49bd-b8e5-57c40345396f",
+        "deliveryId": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+        "driverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:43.864245186Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/c9dd1a26-6488-4c9e-8d68-e5ca347290c3/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/c9dd1a26-6488-4c9e-8d68-e5ca347290c3/delay",
+      "body": {
+        "delayMinutes": 15,
+        "reason": "Demo scenario: heavy traffic"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "delayed": true,
+        "delayMinutes": 15,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/c9dd1a26-6488-4c9e-8d68-e5ca347290c3/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "c9dd1a26-6488-4c9e-8d68-e5ca347290c3",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "38a16656-3d99-4317-9ddc-8179d47592ac",
+        "delayed": true,
+        "delayMinutes": 15,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "parcelWeightKg": 600
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "5dbf705f-4c19-4a83-a584-0391bb3a335c",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "status": "CANCELLED",
+        "assignedDriverId": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 600.0,
+        "targetStatus": "CANCELLED",
+        "expectedDelayed": false,
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "5dbf705f-4c19-4a83-a584-0391bb3a335c",
+        "driverId": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "74ee189f-0387-4288-b816-847d4bed8567",
+        "deliveryId": "5dbf705f-4c19-4a83-a584-0391bb3a335c",
+        "driverId": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:49.967521380Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/5dbf705f-4c19-4a83-a584-0391bb3a335c/cancel",
+      "body": {
+        "reason": "CUSTOMER_REQUEST",
+        "notes": "Demo scenario: customer changed plans"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "5dbf705f-4c19-4a83-a584-0391bb3a335c",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "status": "CANCELLED",
+        "assignedDriverId": "8f9b0691-98cf-4870-ac0a-a602ec71ca5d",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 600.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "parcelWeightKg": 5
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+        "driverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "70b62e80-a3d6-40d1-b208-6e1cab06bd60",
+        "deliveryId": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+        "driverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:54.053748996Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/8c8bf00d-c99f-4e89-928f-88666a7c8519/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/8c8bf00d-c99f-4e89-928f-88666a7c8519/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "8c8bf00d-c99f-4e89-928f-88666a7c8519",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "12 King Street, Sydney NSW",
+        "destinationAddress": "28 Victoria Road, Ryde NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "98ea3ce6-cb54-45d9-b96b-61e860352054",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 5.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "parcelWeightKg": 75
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+        "driverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "789f9877-19f4-461e-ba5c-0d006184d877",
+        "deliveryId": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+        "driverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:42:58.643131908Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/827fb1a8-dc12-48cd-8748-109e43e1a1ec/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/827fb1a8-dc12-48cd-8748-109e43e1a1ec/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "827fb1a8-dc12-48cd-8748-109e43e1a1ec",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "85 George Street, Parramatta NSW",
+        "destinationAddress": "145 Pacific Highway, Chatswood NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "parcelWeightKg": 250
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "delayed": true,
+        "delayMinutes": 10,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0,
+        "targetStatus": "COMPLETED",
+        "expectedDelayed": true,
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+        "driverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "1a6af619-531d-4b14-b735-2d975339bf9d",
+        "deliveryId": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+        "driverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:03.733094954Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/ff3efb60-4cd9-45b8-868c-a00d7a6468d4/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/ff3efb60-4cd9-45b8-868c-a00d7a6468d4/delay",
+      "body": {
+        "delayMinutes": 10,
+        "reason": "Demo scenario: heavy traffic"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "delayed": true,
+        "delayMinutes": 10,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/ff3efb60-4cd9-45b8-868c-a00d7a6468d4/complete",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "ff3efb60-4cd9-45b8-868c-a00d7a6468d4",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "2 Wharf Road, Pyrmont NSW",
+        "destinationAddress": "64 Church Street, Parramatta NSW",
+        "status": "COMPLETED",
+        "assignedDriverId": "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+        "delayed": true,
+        "delayMinutes": 10,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "parcelWeightKg": 600
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "0c4776d9-2ae0-4f68-8e2d-3a832cb6df62",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "status": "CANCELLED",
+        "assignedDriverId": "bb2546b1-fae2-4826-890d-7af4361e2756",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 600.0,
+        "targetStatus": "CANCELLED",
+        "expectedDelayed": false,
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "0c4776d9-2ae0-4f68-8e2d-3a832cb6df62",
+        "driverId": "bb2546b1-fae2-4826-890d-7af4361e2756",
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "219f52fb-c2bc-4998-a33a-6e3013787dcd",
+        "deliveryId": "0c4776d9-2ae0-4f68-8e2d-3a832cb6df62",
+        "driverId": "bb2546b1-fae2-4826-890d-7af4361e2756",
+        "vehicleId": "0f749a4b-c6fb-41d8-a369-2a8b735b284a",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:09.835241308Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/0c4776d9-2ae0-4f68-8e2d-3a832cb6df62/cancel",
+      "body": {
+        "reason": "CUSTOMER_REQUEST",
+        "notes": "Demo scenario: customer changed plans"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "0c4776d9-2ae0-4f68-8e2d-3a832cb6df62",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "28 Victoria Road, Ryde NSW",
+        "destinationAddress": "40 Railway Parade, Burwood NSW",
+        "status": "CANCELLED",
+        "assignedDriverId": "bb2546b1-fae2-4826-890d-7af4361e2756",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 600.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "40 Railway Parade, Burwood NSW",
+        "destinationAddress": "85 George Street, Parramatta NSW",
+        "parcelWeightKg": 75
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "9774774b-6d42-4cf7-b785-45e8d2ba0971",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "40 Railway Parade, Burwood NSW",
+        "destinationAddress": "85 George Street, Parramatta NSW",
+        "status": "ASSIGNED",
+        "assignedDriverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0,
+        "targetStatus": "ASSIGNED",
+        "expectedDelayed": false,
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "9774774b-6d42-4cf7-b785-45e8d2ba0971",
+        "driverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "d450e1fb-381f-43ad-87a8-5d1b22de28ba",
+        "deliveryId": "9774774b-6d42-4cf7-b785-45e8d2ba0971",
+        "driverId": "0290ab8f-0ec1-4b40-bd6b-a84b174308ab",
+        "vehicleId": "3d8b970b-f1e2-4535-b925-6d8dfca23c71",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:13.914590137Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "parcelWeightKg": 250
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "delayed": true,
+        "delayMinutes": 15,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0,
+        "targetStatus": "IN_TRANSIT",
+        "expectedDelayed": true,
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+        "driverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "1b3512f7-5a2e-4973-b546-27838aa4726b",
+        "deliveryId": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+        "driverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "vehicleId": "3453b3d9-e6f7-4c4d-9f67-b8ce130460b0",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:15.972774096Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/ae7330df-913b-41e0-bcfb-1d2ce2bb1c03/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/ae7330df-913b-41e0-bcfb-1d2ce2bb1c03/delay",
+      "body": {
+        "delayMinutes": 15,
+        "reason": "Demo scenario: heavy traffic"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "ae7330df-913b-41e0-bcfb-1d2ce2bb1c03",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "03763e36-4e5a-45f5-811d-60039d796bb6",
+        "delayed": true,
+        "delayMinutes": 15,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "40 Railway Parade, Burwood NSW",
+        "destinationAddress": "85 George Street, Parramatta NSW",
+        "parcelWeightKg": 75
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "671b4946-6dc8-49df-93d4-bd8725993839",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "40 Railway Parade, Burwood NSW",
+        "destinationAddress": "85 George Street, Parramatta NSW",
+        "status": "ASSIGNED",
+        "assignedDriverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0,
+        "targetStatus": "ASSIGNED",
+        "expectedDelayed": false,
+        "vehicleId": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "671b4946-6dc8-49df-93d4-bd8725993839",
+        "driverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "vehicleId": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "7822a27f-c6a4-4520-b010-6d602c48183e",
+        "deliveryId": "671b4946-6dc8-49df-93d4-bd8725993839",
+        "driverId": "084bda1c-09f9-4315-8231-44910fec1e32",
+        "vehicleId": "40e0ace6-24b3-41bb-b49b-e3c3286db5eb",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:18.036231293Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "parcelWeightKg": 250
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "delayed": true,
+        "delayMinutes": 10,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0,
+        "targetStatus": "IN_TRANSIT",
+        "expectedDelayed": true,
+        "vehicleId": "58ae866c-f15e-4878-ae42-135384a80d90"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+        "driverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "vehicleId": "58ae866c-f15e-4878-ae42-135384a80d90"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "5a425494-345e-4d3b-ba23-67bc243e2f12",
+        "deliveryId": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+        "driverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "vehicleId": "58ae866c-f15e-4878-ae42-135384a80d90",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:20.095366384Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/65049d4a-469e-4a2c-8616-ca41075bf82a/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/65049d4a-469e-4a2c-8616-ca41075bf82a/delay",
+      "body": {
+        "delayMinutes": 10,
+        "reason": "Demo scenario: heavy traffic"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "65049d4a-469e-4a2c-8616-ca41075bf82a",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "2681ec6d-db3b-4141-b623-9f47e2357249",
+        "delayed": true,
+        "delayMinutes": 10,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "40 Railway Parade, Burwood NSW",
+        "destinationAddress": "85 George Street, Parramatta NSW",
+        "parcelWeightKg": 75
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "7b6e1a4e-fbc0-4e76-92d0-1ae77577e70e",
+        "customerId": "4e554c01-e9c0-4cd1-b89d-96e693be6710",
+        "pickupAddress": "40 Railway Parade, Burwood NSW",
+        "destinationAddress": "85 George Street, Parramatta NSW",
+        "status": "ASSIGNED",
+        "assignedDriverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 75.0,
+        "targetStatus": "ASSIGNED",
+        "expectedDelayed": false,
+        "vehicleId": "6955f779-1348-4953-ad9d-66059ca0ae81"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "7b6e1a4e-fbc0-4e76-92d0-1ae77577e70e",
+        "driverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "vehicleId": "6955f779-1348-4953-ad9d-66059ca0ae81"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "e8b5cbac-1af3-4e85-a729-962cdbadd4ad",
+        "deliveryId": "7b6e1a4e-fbc0-4e76-92d0-1ae77577e70e",
+        "driverId": "31c7e110-9fc4-4189-a008-647d717335a9",
+        "vehicleId": "6955f779-1348-4953-ad9d-66059ca0ae81",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:22.162160034Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "parcelWeightKg": 250
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "delayed": true,
+        "delayMinutes": 25,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0,
+        "targetStatus": "IN_TRANSIT",
+        "expectedDelayed": true,
+        "vehicleId": "8d944842-0b95-4e21-8685-5e088b72407f"
+      }
+    },
+    {
+      "service": "dispatch",
+      "path": "/api/dispatch/assignments",
+      "body": {
+        "deliveryId": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+        "driverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "vehicleId": "8d944842-0b95-4e21-8685-5e088b72407f"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "19abaa75-4a5a-42df-ad33-4af004848faa",
+        "deliveryId": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+        "driverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "vehicleId": "8d944842-0b95-4e21-8685-5e088b72407f",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-19T03:43:24.216267458Z",
+        "completedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8/start",
+      "body": null,
+      "status": "confirmed",
+      "response": {
+        "id": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries/d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8/delay",
+      "body": {
+        "delayMinutes": 25,
+        "reason": "Demo scenario: heavy traffic"
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "d5c83fc6-f85b-4e76-8bb2-5782e10cf3f8",
+        "customerId": "ecd888c2-a3cd-4d8e-a4a3-9a23ae9b09eb",
+        "pickupAddress": "18 Oxford Street, Bondi Junction NSW",
+        "destinationAddress": "2 Wharf Road, Pyrmont NSW",
+        "status": "IN_TRANSIT",
+        "assignedDriverId": "3415f772-79c4-4733-a6e5-7ee8bc8f170b",
+        "delayed": true,
+        "delayMinutes": 25,
+        "delayReason": "Demo scenario: heavy traffic",
+        "parcelWeightKg": 250.0
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+        "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+        "parcelWeightKg": 25
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "4c588db4-e11e-4d58-869e-77af65df7301",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+        "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+        "status": "PENDING",
+        "assignedDriverId": null,
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 25,
+        "targetStatus": "PENDING",
+        "expectedDelayed": false
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "64 Church Street, Parramatta NSW",
+        "destinationAddress": "12 King Street, Sydney NSW",
+        "parcelWeightKg": 25
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "2a848ec6-fe00-4438-ac4b-55cc52d0d8c6",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "64 Church Street, Parramatta NSW",
+        "destinationAddress": "12 King Street, Sydney NSW",
+        "status": "PENDING",
+        "assignedDriverId": null,
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 25,
+        "targetStatus": "PENDING",
+        "expectedDelayed": false
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+        "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+        "parcelWeightKg": 25
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "6bb268f5-72b7-415e-ad98-8f8465319d37",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+        "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+        "status": "PENDING",
+        "assignedDriverId": null,
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 25,
+        "targetStatus": "PENDING",
+        "expectedDelayed": false
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "64 Church Street, Parramatta NSW",
+        "destinationAddress": "12 King Street, Sydney NSW",
+        "parcelWeightKg": 25
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "7fb18c79-2c38-49ff-a809-8fb421b60e05",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "64 Church Street, Parramatta NSW",
+        "destinationAddress": "12 King Street, Sydney NSW",
+        "status": "PENDING",
+        "assignedDriverId": null,
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 25,
+        "targetStatus": "PENDING",
+        "expectedDelayed": false
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+        "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+        "parcelWeightKg": 25
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "d55c2c0f-a499-49c5-b902-2562046a3228",
+        "customerId": "d7e014ca-416c-4cd6-a111-f60a69162769",
+        "pickupAddress": "145 Pacific Highway, Chatswood NSW",
+        "destinationAddress": "18 Oxford Street, Bondi Junction NSW",
+        "status": "PENDING",
+        "assignedDriverId": null,
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 25,
+        "targetStatus": "PENDING",
+        "expectedDelayed": false
+      }
+    },
+    {
+      "service": "delivery",
+      "path": "/api/deliveries",
+      "body": {
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "64 Church Street, Parramatta NSW",
+        "destinationAddress": "12 King Street, Sydney NSW",
+        "parcelWeightKg": 25
+      },
+      "status": "confirmed",
+      "response": {
+        "id": "f8e23c94-d743-45c6-8836-3f619a4f48dd",
+        "customerId": "c5f74a05-ace3-4c06-bdb0-ee583656da0b",
+        "pickupAddress": "64 Church Street, Parramatta NSW",
+        "destinationAddress": "12 King Street, Sydney NSW",
+        "status": "PENDING",
+        "assignedDriverId": null,
+        "delayed": false,
+        "delayMinutes": null,
+        "delayReason": null,
+        "parcelWeightKg": 25,
+        "targetStatus": "PENDING",
+        "expectedDelayed": false
+      }
+    }
+  ],
+  "pendingDeliveryIds": [
+    "4c588db4-e11e-4d58-869e-77af65df7301",
+    "2a848ec6-fe00-4438-ac4b-55cc52d0d8c6",
+    "6bb268f5-72b7-415e-ad98-8f8465319d37",
+    "7fb18c79-2c38-49ff-a809-8fb421b60e05",
+    "d55c2c0f-a499-49c5-b902-2562046a3228",
+    "f8e23c94-d743-45c6-8836-3f619a4f48dd"
+  ],
+  "availableDriverIds": [
+    "b3bb5d7c-85ea-44d2-abdd-a414b023a473",
+    "98ea3ce6-cb54-45d9-b96b-61e860352054",
+    "bb2546b1-fae2-4826-890d-7af4361e2756",
+    "aca58e27-a254-4ab7-84ae-ccb80a062c32",
+    "38a16656-3d99-4317-9ddc-8179d47592ac",
+    "8f9b0691-98cf-4870-ac0a-a602ec71ca5d"
+  ],
+  "availableVehicleIds": [
+    "392f40cf-948b-4bda-98c2-2fe65ff3fc56",
+    "6b3abe2e-5131-4541-8dbc-6c3b23edc05e",
+    "43dde96a-065f-4221-a142-aaed36548239",
+    "ea044734-e5e3-486c-961e-5c7281461d96",
+    "94656f26-4af5-4262-aa2b-b18b954df176",
+    "0f749a4b-c6fb-41d8-a369-2a8b735b284a"
+  ],
+  "outcomeCounts": {
+    "COMPLETED": 9,
+    "CANCELLED": 3,
+    "ASSIGNED": 3,
+    "IN_TRANSIT": 3,
+    "PENDING": 6
+  },
+  "completedAt": "2026-10-19T03:43:32.374911+00:00"
+}

@@ -3,3 +3,4 @@
 **/*.mv.db
 **/*.trace.db
 outbox-smoke-state.json
+__pycache__

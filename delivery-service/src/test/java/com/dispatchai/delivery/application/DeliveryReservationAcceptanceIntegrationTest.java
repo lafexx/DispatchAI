@@ -3,6 +3,8 @@ package com.dispatchai.delivery.application;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,13 @@ class DeliveryReservationAcceptanceIntegrationTest {
     var event = event();
     service.acceptAssignment(event);
     service.acceptAssignment(event);
-    verify(fleet, times(1)).confirm(event.assignmentId(), event.deliveryId(), event.driverId(), event.vehicleId(), java.math.BigDecimal.ONE);
+    verify(fleet, times(1)).confirm(
+        eq(event.assignmentId()),
+        eq(event.deliveryId()),
+        eq(event.driverId()),
+        eq(event.vehicleId()),
+        argThat(weight -> weight != null
+            && weight.compareTo(java.math.BigDecimal.ONE) == 0));
     assertEquals(DeliveryStatus.ASSIGNED, service.get(event.deliveryId()).status());
     var outcomes = ArgumentCaptor.forClass(DeliveryAssignedEvent.class);
     verify(publisher, times(2)).publish(outcomes.capture());
