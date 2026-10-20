@@ -327,11 +327,3 @@ docker compose up -d agent-service frontend
 ```
 
 Inspect the warm-up logs and test an Agent request rather than relying only on container exit status.
-
-## Further documentation
-
-- [Service structure and package conventions](docs/SERVICE_STRUCTURE.md)
-- [Frontend development and desktop workflows](frontend/README.md)
-- [Demo seeder options and API behaviour](scripts/README.md)
-
-This is a local academic prototype. The Compose setup uses a single Kafka broker and development-oriented frontend hosting; customer notification delivery is simulated. Authentication, production deployment hardening and systematic AI-quality evaluation remain outside the current implementation.
